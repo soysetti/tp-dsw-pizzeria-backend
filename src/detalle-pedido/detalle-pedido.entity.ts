@@ -2,6 +2,7 @@ import { Entity, Property, ManyToOne, Rel } from '@mikro-orm/core';
 import { Pizza } from '../pizza/pizza.entity.js';
 import { Pedido } from '../pedido/pedido.entity.js';
 
+@Entity()
 export class DetallePedido {
   @ManyToOne(() => Pedido, { primary: true })
   pedido!: Rel<Pedido>;
