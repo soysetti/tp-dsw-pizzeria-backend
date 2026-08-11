@@ -1,8 +1,9 @@
-import { Entity, Property, OneToMany, OneToOne, ManyToOne, Collection } from '@mikro-orm/core';
+import { Entity, Property, OneToMany, OneToOne, ManyToOne, Collection, Rel } from '@mikro-orm/core';
 import { BaseEntity } from '../shared/db/base.entity.js';
 import { DetallePedido } from '../detalle-pedido/detalle-pedido.entity.js';
 import { Envio } from '../envio/envio.entity.js';
 import { Repartidor } from '../repartidor/repartidor.entity.js';
+import { Cliente } from '../cliente/cliente.entity.js';
 
 @Entity()
 export class Pedido extends BaseEntity {
@@ -29,4 +30,7 @@ export class Pedido extends BaseEntity {
 
   @ManyToOne(() => Repartidor, { nullable: true })
   repartidor?: Repartidor;
+
+  @ManyToOne(() => Cliente, { nullable: true })
+  cliente?: Rel<Cliente>;
 }
