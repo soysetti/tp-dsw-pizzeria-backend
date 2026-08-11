@@ -91,7 +91,7 @@ export async function add(req: Request, res: Response) {
       });
     }
 
-    const nuevo = await repository.add({ cantidad, pizza, ingrediente } as any);
+    const nuevo = await repository.add({ cantidad, pizza, ingrediente });
     return res.status(201).json({ message: 'Ingrediente agregado a la pizza con éxito', data: nuevo });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });

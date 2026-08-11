@@ -1,3 +1,4 @@
+import { RequiredEntityData } from '@mikro-orm/core';
 import { orm } from '../shared/db/orm.js';
 import { IngredientePizza } from './ingrediente-pizza.entity.js';
 
@@ -18,7 +19,7 @@ export class IngredientePizzaRepository {
     return orm.em.find(IngredientePizza, { pizza: pizzaId }, { populate: ['ingrediente'] });
   }
 
-  async add(item: IngredientePizza): Promise<IngredientePizza> {
+ async add(item: RequiredEntityData<IngredientePizza>): Promise<IngredientePizza> {
     const ip = orm.em.create(IngredientePizza, item);
     await orm.em.persistAndFlush(ip);
     return ip;

@@ -90,7 +90,7 @@ export async function add(req: Request, res: Response) {
       });
     }
 
-    const nuevoDetalle = await repository.add({ cantidad, pizza, pedido } as any);
+    const nuevoDetalle = await repository.add({ cantidad, pizza, pedido });
     return res.status(201).json({ message: 'Detalle de pedido creado con éxito', data: nuevoDetalle });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
