@@ -68,7 +68,7 @@ export async function add(req: Request, res: Response) {
       return res.status(404).json({ message: `No existe un pedido con id ${pedidoId}` });
     }
 
-    const nuevoDetalle = await repository.add({ cantidad, pizzaId, pedidoId });
+    const nuevoDetalle = await repository.add({ cantidad, pizza, pedido } as any);
     return res.status(201).json({ message: 'Detalle de pedido creado con éxito', data: nuevoDetalle });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
@@ -87,20 +87,25 @@ export async function update(req: Request, res: Response) {
       return res.status(400).json({ message: 'La cantidad debe ser un número mayor a 0' });
     }
 
+    const cambios: any = {};
+    if (cantidad !== undefined) cambios.cantidad = cantidad;
+
     if (pizzaId !== undefined) {
       const pizza = await pizzaRepository.findOne(pizzaId);
       if (!pizza) {
         return res.status(404).json({ message: `No existe una pizza con id ${pizzaId}` });
       }
+      cambios.pizza = pizza;
     }
     if (pedidoId !== undefined) {
       const pedido = await pedidoRepository.findOne(pedidoId);
       if (!pedido) {
         return res.status(404).json({ message: `No existe un pedido con id ${pedidoId}` });
       }
+      cambios.pedido = pedido;
     }
 
-    const detalle = await repository.update(id, req.body.detalleInput);
+    const detalle = await repository.update(id, cambios);
     if (!detalle) {
       return res.status(404).json({ message: 'Detalle de pedido no encontrado' });
     }
@@ -112,4 +117,13 @@ export async function update(req: Request, res: Response) {
 
 export async function remove(req: Request, res: Response) {
   try {
-    const id =
+    const id = Number(req.params.id);
+    const eliminado = await repository.delete(id);
+    if (!eliminado) {
+      return res.status(404).json({ message: 'Detalle de pedido no encontrado' });
+    }
+    return res.status(200).json({ message: 'Detalle de pedido eliminado exitosamente' });
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
+  }
+}

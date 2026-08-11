@@ -1,18 +1,8 @@
 import { orm } from '../shared/db/orm.js';
 import { DetallePedido } from './detalle-pedido.entity.js';
-import { Pizza } from '../pizza/pizza.entity.js';
-import { Pedido } from '../pedido/pedido.entity.js';
+import { Repository } from '../shared/repository.js';
 
-// DetallePedido no implementa Repository<T> como las demás entidades:
-// para crear o actualizar un detalle necesitamos el id de la pizza y del
-// pedido (no el objeto completo), así que la forma de entrada es distinta.
-export interface DetallePedidoInput {
-  cantidad: number;
-  pizzaId: number;
-  pedidoId: number;
-}
-
-export class DetallePedidoRepository {
+export class DetallePedidoRepository implements Repository<DetallePedido> {
   async findAll(): Promise<DetallePedido[]> {
     return orm.em.find(DetallePedido, {}, { populate: ['pizza', 'pedido'] });
   }
@@ -21,24 +11,16 @@ export class DetallePedidoRepository {
     return orm.em.findOne(DetallePedido, { id }, { populate: ['pizza', 'pedido'] });
   }
 
-  async add(item: DetallePedidoInput): Promise<DetallePedido> {
-    const detalle = new DetallePedido();
-    detalle.cantidad = item.cantidad;
-    detalle.pizza = orm.em.getReference(Pizza, item.pizzaId);
-    detalle.pedido = orm.em.getReference(Pedido, item.pedidoId);
-
+  async add(item: DetallePedido): Promise<DetallePedido> {
+    const detalle = orm.em.create(DetallePedido, item);
     await orm.em.persistAndFlush(detalle);
     return detalle;
   }
 
-  async update(id: number, item: Partial<DetallePedidoInput>): Promise<DetallePedido | null> {
+  async update(id: number, item: Partial<DetallePedido>): Promise<DetallePedido | null> {
     const detalle = await orm.em.findOne(DetallePedido, { id });
     if (!detalle) return null;
-
-    if (item.cantidad !== undefined) detalle.cantidad = item.cantidad;
-    if (item.pizzaId !== undefined) detalle.pizza = orm.em.getReference(Pizza, item.pizzaId);
-    if (item.pedidoId !== undefined) detalle.pedido = orm.em.getReference(Pedido, item.pedidoId);
-
+    orm.em.assign(detalle, item);
     await orm.em.flush();
     return detalle;
   }
