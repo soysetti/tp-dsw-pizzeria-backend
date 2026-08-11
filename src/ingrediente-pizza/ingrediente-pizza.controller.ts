@@ -34,8 +34,9 @@ export async function findAll(req: Request, res: Response) {
 
 export async function findOne(req: Request, res: Response) {
   try {
-    const id = Number(req.params.id);
-    const data = await repository.findOne(id);
+    const pizzaId = Number(req.params.pizzaId);
+    const ingredienteId = Number(req.params.ingredienteId);
+    const data = await repository.findOne(pizzaId, ingredienteId);
     if (!data) {
       return res.status(404).json({ message: 'Registro no encontrado' });
     }
@@ -83,6 +84,13 @@ export async function add(req: Request, res: Response) {
       return res.status(404).json({ message: `No existe un ingrediente con id ${ingredienteId}` });
     }
 
+    const existente = await repository.findOne(pizzaId, ingredienteId);
+    if (existente) {
+      return res.status(409).json({
+        message: 'Ese ingrediente ya está asociado a esa pizza. Usá PUT para modificar la cantidad.',
+      });
+    }
+
     const nuevo = await repository.add({ cantidad, pizza, ingrediente } as any);
     return res.status(201).json({ message: 'Ingrediente agregado a la pizza con éxito', data: nuevo });
   } catch (error: any) {
@@ -92,35 +100,15 @@ export async function add(req: Request, res: Response) {
 
 export async function update(req: Request, res: Response) {
   try {
-    const id = Number(req.params.id);
-    const { cantidad, pizzaId, ingredienteId } = req.body.ingredientePizzaInput;
+    const pizzaId = Number(req.params.pizzaId);
+    const ingredienteId = Number(req.params.ingredienteId);
+    const { cantidad } = req.body.ingredientePizzaInput;
 
-    if (Object.keys(req.body.ingredientePizzaInput).length === 0) {
-      return res.status(400).json({ message: 'Debe enviar al menos un campo para actualizar' });
-    }
-    if (cantidad !== undefined && (typeof cantidad !== 'number' || cantidad <= 0)) {
-      return res.status(400).json({ message: 'La cantidad debe ser un número mayor a 0' });
+    if (cantidad === undefined || typeof cantidad !== 'number' || cantidad <= 0) {
+      return res.status(400).json({ message: 'La cantidad es requerida y debe ser un número mayor a 0' });
     }
 
-    const cambios: any = {};
-    if (cantidad !== undefined) cambios.cantidad = cantidad;
-
-    if (pizzaId !== undefined) {
-      const pizza = await pizzaRepository.findOne(pizzaId);
-      if (!pizza) {
-        return res.status(404).json({ message: `No existe una pizza con id ${pizzaId}` });
-      }
-      cambios.pizza = pizza;
-    }
-    if (ingredienteId !== undefined) {
-      const ingrediente = await ingredienteRepository.findOne(ingredienteId);
-      if (!ingrediente) {
-        return res.status(404).json({ message: `No existe un ingrediente con id ${ingredienteId}` });
-      }
-      cambios.ingrediente = ingrediente;
-    }
-
-    const data = await repository.update(id, cambios);
+    const data = await repository.update(pizzaId, ingredienteId, { cantidad });
     if (!data) {
       return res.status(404).json({ message: 'Registro no encontrado' });
     }
@@ -132,8 +120,9 @@ export async function update(req: Request, res: Response) {
 
 export async function remove(req: Request, res: Response) {
   try {
-    const id = Number(req.params.id);
-    const eliminado = await repository.delete(id);
+    const pizzaId = Number(req.params.pizzaId);
+    const ingredienteId = Number(req.params.ingredienteId);
+    const eliminado = await repository.delete(pizzaId, ingredienteId);
     if (!eliminado) {
       return res.status(404).json({ message: 'Registro no encontrado' });
     }

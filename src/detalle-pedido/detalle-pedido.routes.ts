@@ -3,6 +3,7 @@ import {
   sanitizeDetallePedidoInput,
   findAll,
   findOne,
+  findByPedido,
   add,
   update,
   remove,
@@ -11,7 +12,8 @@ import {
 export const detallePedidoRouter = Router();
 
 detallePedidoRouter.get('/', findAll);
-detallePedidoRouter.get('/:id', findOne);
+detallePedidoRouter.get('/pedido/:pedidoId', findByPedido);
+detallePedidoRouter.get('/:pedidoId/:pizzaId', findOne);
 detallePedidoRouter.post('/', sanitizeDetallePedidoInput, add);
-detallePedidoRouter.put('/:id', sanitizeDetallePedidoInput, update);
-detallePedidoRouter.delete('/:id', remove);
+detallePedidoRouter.put('/:pedidoId/:pizzaId', sanitizeDetallePedidoInput, update);
+detallePedidoRouter.delete('/:pedidoId/:pizzaId', remove);

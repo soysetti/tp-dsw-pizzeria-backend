@@ -1,18 +1,16 @@
 import { Entity, Property, ManyToOne, Rel } from '@mikro-orm/core';
-import { BaseEntity } from '../shared/db/base.entity.js';
 import { Pizza } from '../pizza/pizza.entity.js';
 import { Pedido } from '../pedido/pedido.entity.js';
 
-@Entity()
-export class DetallePedido extends BaseEntity {
-  @Property({ type: 'number' })
-  cantidad!: number;
+export class DetallePedido {
+  @ManyToOne(() => Pedido, { primary: true })
+  pedido!: Rel<Pedido>;
 
-  @ManyToOne(() => Pizza)
+  @ManyToOne(() => Pizza, { primary: true })
   pizza!: Rel<Pizza>;
 
-  @ManyToOne(() => Pedido)
-  pedido!: Rel<Pedido>;
+  @Property({ type: 'number' })
+  cantidad!: number;
 
   // subtotal es atributo derivado (el "/" del diagrama): no se persiste
   get subtotal(): number {

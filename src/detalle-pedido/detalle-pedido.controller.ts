@@ -34,12 +34,27 @@ export async function findAll(req: Request, res: Response) {
 
 export async function findOne(req: Request, res: Response) {
   try {
-    const id = Number(req.params.id);
-    const detalle = await repository.findOne(id);
+    const pedidoId = Number(req.params.pedidoId);
+    const pizzaId = Number(req.params.pizzaId);
+    const detalle = await repository.findOne(pedidoId, pizzaId);
     if (!detalle) {
       return res.status(404).json({ message: 'Detalle de pedido no encontrado' });
     }
     return res.status(200).json({ data: detalle });
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
+export async function findByPedido(req: Request, res: Response) {
+  try {
+    const pedidoId = Number(req.params.pedidoId);
+    const pedido = await pedidoRepository.findOne(pedidoId);
+    if (!pedido) {
+      return res.status(404).json({ message: `No existe un pedido con id ${pedidoId}` });
+    }
+    const data = await repository.findByPedido(pedidoId);
+    return res.status(200).json({ data });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
   }
@@ -68,6 +83,13 @@ export async function add(req: Request, res: Response) {
       return res.status(404).json({ message: `No existe un pedido con id ${pedidoId}` });
     }
 
+    const existente = await repository.findOne(pedidoId, pizzaId);
+    if (existente) {
+      return res.status(409).json({
+        message: 'Esa pizza ya está en el pedido. Usá PUT para modificar la cantidad.',
+      });
+    }
+
     const nuevoDetalle = await repository.add({ cantidad, pizza, pedido } as any);
     return res.status(201).json({ message: 'Detalle de pedido creado con éxito', data: nuevoDetalle });
   } catch (error: any) {
@@ -77,35 +99,15 @@ export async function add(req: Request, res: Response) {
 
 export async function update(req: Request, res: Response) {
   try {
-    const id = Number(req.params.id);
-    const { cantidad, pizzaId, pedidoId } = req.body.detalleInput;
+    const pedidoId = Number(req.params.pedidoId);
+    const pizzaId = Number(req.params.pizzaId);
+    const { cantidad } = req.body.detalleInput;
 
-    if (Object.keys(req.body.detalleInput).length === 0) {
-      return res.status(400).json({ message: 'Debe enviar al menos un campo para actualizar' });
-    }
-    if (cantidad !== undefined && (typeof cantidad !== 'number' || cantidad <= 0)) {
-      return res.status(400).json({ message: 'La cantidad debe ser un número mayor a 0' });
+    if (cantidad === undefined || typeof cantidad !== 'number' || cantidad <= 0) {
+      return res.status(400).json({ message: 'La cantidad es requerida y debe ser un número mayor a 0' });
     }
 
-    const cambios: any = {};
-    if (cantidad !== undefined) cambios.cantidad = cantidad;
-
-    if (pizzaId !== undefined) {
-      const pizza = await pizzaRepository.findOne(pizzaId);
-      if (!pizza) {
-        return res.status(404).json({ message: `No existe una pizza con id ${pizzaId}` });
-      }
-      cambios.pizza = pizza;
-    }
-    if (pedidoId !== undefined) {
-      const pedido = await pedidoRepository.findOne(pedidoId);
-      if (!pedido) {
-        return res.status(404).json({ message: `No existe un pedido con id ${pedidoId}` });
-      }
-      cambios.pedido = pedido;
-    }
-
-    const detalle = await repository.update(id, cambios);
+    const detalle = await repository.update(pedidoId, pizzaId, { cantidad });
     if (!detalle) {
       return res.status(404).json({ message: 'Detalle de pedido no encontrado' });
     }
@@ -117,8 +119,9 @@ export async function update(req: Request, res: Response) {
 
 export async function remove(req: Request, res: Response) {
   try {
-    const id = Number(req.params.id);
-    const eliminado = await repository.delete(id);
+    const pedidoId = Number(req.params.pedidoId);
+    const pizzaId = Number(req.params.pizzaId);
+    const eliminado = await repository.delete(pedidoId, pizzaId);
     if (!eliminado) {
       return res.status(404).json({ message: 'Detalle de pedido no encontrado' });
     }
