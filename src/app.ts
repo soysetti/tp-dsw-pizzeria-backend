@@ -8,6 +8,8 @@ import { repartidorRouter } from './repartidor/repartidor.routes.js';
 import { pedidoRouter } from './pedido/pedido.routes.js';
 import { detallePedidoRouter } from './detalle-pedido/detalle-pedido.routes.js';
 import { envioRouter } from './envio/envio.routes.js';
+import { ingredientePizzaRouter } from './ingrediente-pizza/ingrediente-pizza.routes.js';
+
 
 const app = express();
 app.use(express.json()); // Middleware para parsear JSONs en el body
@@ -36,6 +38,9 @@ app.use('/api/pedidos', pedidoRouter);
 app.use('/api/detalle-pedido', detallePedidoRouter);
 
 app.use('/api/envios', envioRouter);
+
+// Registramos el router de ingrediente-pizza
+app.use('/api/ingrediente-pizza', ingredientePizzaRouter);
 
 // Manejador global para endpoints inexistentes (404)
 app.use((_, res) => {
