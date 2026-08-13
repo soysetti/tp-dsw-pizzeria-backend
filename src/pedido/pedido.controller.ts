@@ -1,15 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
-import { PedidoRepository } from './pedido.repository.js';
+import { PedidoRepository, ItemPedidoInput } from './pedido.repository.js';
+import { PizzaRepository } from '../pizza/pizza.repository.js';
 
 const repository = new PedidoRepository();
+const pizzaRepository = new PizzaRepository();
 
 export function sanitizePedidoInput(req: Request, res: Response, next: NextFunction) {
   req.body.pedidoInput = {
-    dia: req.body.dia,
-    total: req.body.total,
-    tipoPedido: req.body.tipoPedido,
+    retiro: req.body.retiro,
     estado: req.body.estado,
-    categoria: req.body.categoria,
+    items: req.body.items,
   };
 
   Object.keys(req.body.pedidoInput).forEach((key) => {
@@ -45,13 +45,40 @@ export async function findOne(req: Request, res: Response) {
 
 export async function add(req: Request, res: Response) {
   try {
-    const { tipoPedido, categoria } = req.body.pedidoInput;
+    const { retiro, items } = req.body.pedidoInput;
 
-    if (!tipoPedido || !categoria) {
-      return res.status(400).json({ message: 'Faltan datos: tipoPedido y categoria son requeridos' });
+    if (typeof retiro !== 'boolean') {
+      return res.status(400).json({ message: 'retiro es requerido y debe ser true o false' });
+    }
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: 'items es requerido y debe ser una lista con al menos una pizza' });
     }
 
-    const nuevoPedido = await repository.add(req.body.pedidoInput);
+    // Validamos la forma de cada item antes de tocar la base de datos
+    for (const item of items) {
+      if (typeof item.pizzaId !== 'number' || typeof item.cantidad !== 'number' || item.cantidad <= 0) {
+        return res.status(400).json({
+          message: 'Cada item debe tener pizzaId (número) y cantidad (número mayor a 0)',
+        });
+      }
+    }
+
+    // Buscamos y validamos que cada pizza exista y esté disponible
+    const itemsConPizza: ItemPedidoInput[] = [];
+    for (const item of items) {
+      const pizza = await pizzaRepository.findOne(item.pizzaId);
+      if (!pizza) {
+        return res.status(404).json({ message: `No existe una pizza con id ${item.pizzaId}` });
+      }
+      if (!pizza.disponible) {
+        return res.status(400).json({ message: `La pizza "${pizza.nombre}" no está disponible` });
+      }
+      itemsConPizza.push({ pizza, cantidad: item.cantidad });
+    }
+
+    // El cliente solo define "retiro" y las pizzas del pedido.
+    // dia, total y estado los calcula/asigna el sistema.
+    const nuevoPedido = await repository.addConItems(retiro, itemsConPizza);
     return res.status(201).json({ message: 'Pedido creado con éxito', data: nuevoPedido });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
@@ -61,6 +88,11 @@ export async function add(req: Request, res: Response) {
 export async function update(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
+
+    // "items" solo tiene sentido en la creación (add). El update de Pedido
+    // no toca los ítems del pedido — eso se maneja desde /api/detalle-pedido.
+    delete req.body.pedidoInput.items;
+
     const pedido = await repository.update(id, req.body.pedidoInput);
     if (!pedido) {
       return res.status(404).json({ message: 'Pedido no encontrado' });

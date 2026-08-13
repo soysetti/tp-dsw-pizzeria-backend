@@ -13,14 +13,11 @@ export class Pedido extends BaseEntity {
   @Property({ type: 'number' })
   total: number = 0;
 
-  @Property({ type: 'string' })
-  tipoPedido!: string;
+  @Property({ type: 'boolean' })
+  retiro!: boolean;
 
   @Property({ type: 'string' })
   estado: string = 'Pendiente';
-
-  @Property({ type: 'string' })
-  categoria!: string;
 
   @OneToMany(() => DetallePedido, (detalle) => detalle.pedido)
   detalles = new Collection<DetallePedido>(this);
