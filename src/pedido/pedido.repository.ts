@@ -11,9 +11,10 @@ export interface ItemPedidoInput {
 }
 
 export class PedidoRepository implements Repository<Pedido> {
-  async findAll(): Promise<Pedido[]> {
-    return orm.em.find(Pedido, {});
-  }
+  async findAll(estado?: string): Promise<Pedido[]> {
+  const filtro = estado ? { estado } : {};
+  return orm.em.find(Pedido, filtro, { populate: ['detalles', 'detalles.pizza'] });
+}
 
   async findOne(id: number): Promise<Pedido | null> {
     return orm.em.findOne(Pedido, { id }, { populate: ['detalles', 'detalles.pizza'] });
@@ -40,6 +41,23 @@ export class PedidoRepository implements Repository<Pedido> {
       const detalleData = { pedido, pizza, cantidad } as Omit<RequiredEntityData<DetallePedido>, 'subtotal'>;
       orm.em.create(DetallePedido, detalleData as RequiredEntityData<DetallePedido>);
       total += cantidad * pizza.precio;
+    }
+    pedido.total = total;
+
+    await orm.em.flush();
+    return pedido;
+  }
+
+  // Recalcula el total del pedido en base a sus detalles actuales.
+  // Se usa cada vez que detalle-pedido agrega/modifica/borra un ítem,
+  // para que Pedido.total no quede desactualizado.
+  async recalcularTotal(id: number): Promise<Pedido | null> {
+    const pedido = await orm.em.findOne(Pedido, { id }, { populate: ['detalles', 'detalles.pizza'] });
+    if (!pedido) return null;
+
+    let total = 0;
+    for (const detalle of pedido.detalles) {
+      total += detalle.cantidad * detalle.pizza.precio;
     }
     pedido.total = total;
 

@@ -91,7 +91,13 @@ export async function add(req: Request, res: Response) {
     }
 
     const nuevoDetalle = await repository.add({ cantidad, pizza, pedido });
-    return res.status(201).json({ message: 'Detalle de pedido creado con éxito', data: nuevoDetalle });
+    const pedidoActualizado = await pedidoRepository.recalcularTotal(pedidoId);
+
+    return res.status(201).json({
+      message: 'Detalle de pedido creado con éxito',
+      data: nuevoDetalle,
+      pedido: pedidoActualizado,
+    });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
   }
@@ -111,7 +117,13 @@ export async function update(req: Request, res: Response) {
     if (!detalle) {
       return res.status(404).json({ message: 'Detalle de pedido no encontrado' });
     }
-    return res.status(200).json({ message: 'Detalle de pedido actualizado', data: detalle });
+    const pedidoActualizado = await pedidoRepository.recalcularTotal(pedidoId);
+
+    return res.status(200).json({
+      message: 'Detalle de pedido actualizado',
+      data: detalle,
+      pedido: pedidoActualizado,
+    });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
   }
@@ -125,7 +137,12 @@ export async function remove(req: Request, res: Response) {
     if (!eliminado) {
       return res.status(404).json({ message: 'Detalle de pedido no encontrado' });
     }
-    return res.status(200).json({ message: 'Detalle de pedido eliminado exitosamente' });
+    const pedidoActualizado = await pedidoRepository.recalcularTotal(pedidoId);
+
+    return res.status(200).json({
+      message: 'Detalle de pedido eliminado exitosamente',
+      pedido: pedidoActualizado,
+    });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
   }
