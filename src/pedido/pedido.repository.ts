@@ -2,6 +2,7 @@ import { RequiredEntityData } from '@mikro-orm/core';
 import { orm } from '../shared/db/orm.js';
 import { Pedido } from './pedido.entity.js';
 import { Pizza } from '../pizza/pizza.entity.js';
+import { Cliente } from '../cliente/cliente.entity.js';
 import { DetallePedido } from '../detalle-pedido/detalle-pedido.entity.js';
 import { Repository } from '../shared/repository.js';
 
@@ -12,24 +13,26 @@ export interface ItemPedidoInput {
 
 export class PedidoRepository implements Repository<Pedido> {
   async findAll(estado?: string): Promise<Pedido[]> {
-  const filtro = estado ? { estado } : {};
-  return orm.em.find(Pedido, filtro, { populate: ['detalles', 'detalles.pizza'] });
-}
+    const filtro = estado ? { estado } : {};
+    return orm.em.find(Pedido, filtro, { populate: ['detalles', 'detalles.pizza'] });
+  }
 
   async findOne(id: number): Promise<Pedido | null> {
-  return orm.em.findOne(Pedido, { id }, { populate: ['detalles', 'detalles.pizza', 'cliente'] });
-}
+    return orm.em.findOne(Pedido, { id }, { populate: ['detalles', 'detalles.pizza', 'cliente'] });
+  }
+
   async add(item: Pedido): Promise<Pedido> {
     const pedido = orm.em.create(Pedido, item);
     await orm.em.persistAndFlush(pedido);
     return pedido;
   }
 
-  // CUU: registrar un pedido junto con sus ítems (pizza + cantidad).
+  // CUU: registrar un pedido para un cliente, junto con sus ítems (pizza + cantidad).
   // El total se calcula acá, nunca lo manda el cliente.
-  async addConItems(retiro: boolean, items: ItemPedidoInput[]): Promise<Pedido> {
+  async addConItems(retiro: boolean, cliente: Cliente, items: ItemPedidoInput[]): Promise<Pedido> {
     const pedido = orm.em.create(Pedido, {
       retiro,
+      cliente,
       estado: 'Pendiente',
       dia: new Date(),
       total: 0,

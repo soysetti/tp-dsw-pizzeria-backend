@@ -1,14 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import { PedidoRepository, ItemPedidoInput } from './pedido.repository.js';
 import { PizzaRepository } from '../pizza/pizza.repository.js';
+import { ClienteRepository } from '../cliente/cliente.repository.js';
 
 const repository = new PedidoRepository();
 const pizzaRepository = new PizzaRepository();
+const clienteRepository = new ClienteRepository();
 
 export function sanitizePedidoInput(req: Request, res: Response, next: NextFunction) {
   req.body.pedidoInput = {
     retiro: req.body.retiro,
     estado: req.body.estado,
+    clienteId: req.body.clienteId,
     items: req.body.items,
   };
 
@@ -46,10 +49,13 @@ export async function findOne(req: Request, res: Response) {
 
 export async function add(req: Request, res: Response) {
   try {
-    const { retiro, items } = req.body.pedidoInput;
+    const { retiro, clienteId, items } = req.body.pedidoInput;
 
     if (typeof retiro !== 'boolean') {
       return res.status(400).json({ message: 'retiro es requerido y debe ser true o false' });
+    }
+    if (clienteId === undefined || typeof clienteId !== 'number') {
+      return res.status(400).json({ message: 'clienteId es requerido y debe ser un número' });
     }
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ message: 'items es requerido y debe ser una lista con al menos una pizza' });
@@ -62,6 +68,12 @@ export async function add(req: Request, res: Response) {
           message: 'Cada item debe tener pizzaId (número) y cantidad (número mayor a 0)',
         });
       }
+    }
+
+    // Validamos que el cliente exista
+    const cliente = await clienteRepository.findOne(clienteId);
+    if (!cliente) {
+      return res.status(404).json({ message: `No existe un cliente con id ${clienteId}` });
     }
 
     // Buscamos y validamos que cada pizza exista y esté disponible
@@ -77,9 +89,9 @@ export async function add(req: Request, res: Response) {
       itemsConPizza.push({ pizza, cantidad: item.cantidad });
     }
 
-    // El cliente solo define "retiro" y las pizzas del pedido.
+    // El cliente solo define "retiro", "clienteId" y las pizzas del pedido.
     // dia, total y estado los calcula/asigna el sistema.
-    const nuevoPedido = await repository.addConItems(retiro, itemsConPizza);
+    const nuevoPedido = await repository.addConItems(retiro, cliente, itemsConPizza);
     return res.status(201).json({ message: 'Pedido creado con éxito', data: nuevoPedido });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
