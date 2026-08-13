@@ -23,7 +23,8 @@ export function sanitizePedidoInput(req: Request, res: Response, next: NextFunct
 
 export async function findAll(req: Request, res: Response) {
   try {
-    const pedidos = await repository.findAll();
+    const estado = req.query.estado as string | undefined;
+    const pedidos = await repository.findAll(estado);
     return res.status(200).json({ message: 'Todos los pedidos recuperados', data: pedidos });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });

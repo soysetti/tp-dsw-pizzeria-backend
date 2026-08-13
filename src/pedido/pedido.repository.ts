@@ -17,9 +17,8 @@ export class PedidoRepository implements Repository<Pedido> {
 }
 
   async findOne(id: number): Promise<Pedido | null> {
-    return orm.em.findOne(Pedido, { id }, { populate: ['detalles', 'detalles.pizza'] });
-  }
-
+  return orm.em.findOne(Pedido, { id }, { populate: ['detalles', 'detalles.pizza', 'cliente'] });
+}
   async add(item: Pedido): Promise<Pedido> {
     const pedido = orm.em.create(Pedido, item);
     await orm.em.persistAndFlush(pedido);
