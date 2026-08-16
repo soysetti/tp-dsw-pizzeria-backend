@@ -32,7 +32,12 @@ export async function findAll(req: Request, res: Response) {
 
 export async function findOne(req: Request, res: Response) {
   try {
-    const ingrediente = await service.buscarIngrediente(Number(req.params.id));
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'El ID provisto debe ser un número entero válido' });
+    }
+
+    const ingrediente = await service.buscarIngrediente(id);
     return res.status(200).json({ data: ingrediente });
   } catch (error) {
     return handleError(res, error);

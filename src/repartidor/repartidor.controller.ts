@@ -3,6 +3,10 @@ import * as service from './repartidor.service.js';
 import { handleError } from '../shared/handle-error.js';
 
 export function sanitizeRepartidorInput(req: Request, res: Response, next: NextFunction) {
+  if (!req.body) {
+    return res.status(400).json({ message: 'El cuerpo de la petición es requerido' });
+  }
+
   req.body.repartidorInput = {
     nombre: req.body.nombre,
     apellido: req.body.apellido,

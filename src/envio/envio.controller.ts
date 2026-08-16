@@ -3,6 +3,10 @@ import * as service from './envio.service.js';
 import { handleError } from '../shared/handle-error.js';
 
 export function sanitizeEnvioInput(req: Request, res: Response, next: NextFunction) {
+  if (!req.body) {
+    return res.status(400).json({ message: 'El cuerpo de la petición es requerido' });
+  }
+
   req.body.envioInput = {
     costo: req.body.costo,
     monto_propina: req.body.monto_propina,
@@ -40,6 +44,7 @@ export async function findOne(req: Request, res: Response) {
     return handleError(res, error);
   }
 }
+
 export async function add(req: Request, res: Response) {
   try {
     const nuevoEnvio = await service.crearEnvio(req.body.envioInput);
