@@ -34,7 +34,12 @@ export async function findAll(req: Request, res: Response) {
 
 export async function findOne(req: Request, res: Response) {
   try {
-    const repartidor = await service.buscarRepartidor(Number(req.params.id));
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'El ID provisto debe ser un número entero válido' });
+    }
+
+    const repartidor = await service.buscarRepartidor(id);
     return res.status(200).json({ data: repartidor });
   } catch (error) {
     return handleError(res, error);
@@ -52,7 +57,12 @@ export async function add(req: Request, res: Response) {
 
 export async function update(req: Request, res: Response) {
   try {
-    const repartidor = await service.actualizarRepartidor(Number(req.params.id), req.body.repartidorInput);
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'El ID provisto debe ser un número entero válido' });
+    }
+
+    const repartidor = await service.actualizarRepartidor(id, req.body.repartidorInput);
     return res.status(200).json({ message: 'Repartidor actualizado', data: repartidor });
   } catch (error) {
     return handleError(res, error);
@@ -61,7 +71,12 @@ export async function update(req: Request, res: Response) {
 
 export async function remove(req: Request, res: Response) {
   try {
-    await service.eliminarRepartidor(Number(req.params.id));
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'El ID provisto debe ser un número entero válido' });
+    }
+
+    await service.eliminarRepartidor(id);
     return res.status(200).json({ message: 'Repartidor eliminado exitosamente' });
   } catch (error) {
     return handleError(res, error);

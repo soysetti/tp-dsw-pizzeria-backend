@@ -3,6 +3,10 @@ import * as service from './pedido.service.js';
 import { handleError } from '../shared/handle-error.js';
 
 export function sanitizePedidoInput(req: Request, res: Response, next: NextFunction) {
+  if (!req.body) {
+    return res.status(400).json({ message: 'El cuerpo de la petición es requerido' });
+  }
+
   req.body.pedidoInput = {
     retiro: req.body.retiro,
     estado: req.body.estado,
@@ -31,7 +35,12 @@ export async function findAll(req: Request, res: Response) {
 
 export async function findOne(req: Request, res: Response) {
   try {
-    const pedido = await service.buscarPedido(Number(req.params.id));
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'El ID provisto debe ser un número entero válido' });
+    }
+
+    const pedido = await service.buscarPedido(id);
     return res.status(200).json({ data: pedido });
   } catch (error) {
     return handleError(res, error);
@@ -51,6 +60,9 @@ export async function add(req: Request, res: Response) {
 export async function update(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'El ID provisto debe ser un número entero válido' });
+    }
 
     // "items" y "clienteId" solo tienen sentido en la creación (add).
     delete req.body.pedidoInput.items;
@@ -62,10 +74,13 @@ export async function update(req: Request, res: Response) {
     return handleError(res, error);
   }
 }
-
 export async function remove(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'El ID provisto debe ser un número entero válido' });
+    }
+
     await service.eliminarPedido(id);
     return res.status(200).json({ message: 'Pedido eliminado exitosamente' });
   } catch (error) {

@@ -3,6 +3,10 @@ import * as service from './cliente.service.js';
 import { handleError } from '../shared/handle-error.js';
 
 export function sanitizeClienteInput(req: Request, res: Response, next: NextFunction) {
+  if (!req.body) {
+    return res.status(400).json({ message: 'El cuerpo de la petición es requerido' });
+  }
+
   req.body.clienteInput = {
     nombre: req.body.nombre,
     apellido: req.body.apellido,
@@ -33,12 +37,18 @@ export async function findAll(req: Request, res: Response) {
 
 export async function findOne(req: Request, res: Response) {
   try {
-    const cliente = await service.buscarCliente(Number(req.params.id));
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'El ID provisto debe ser un número entero válido' });
+    }
+
+    const cliente = await service.buscarCliente(id);
     return res.status(200).json({ data: cliente });
   } catch (error) {
     return handleError(res, error);
   }
 }
+
 
 export async function add(req: Request, res: Response) {
   try {
@@ -51,7 +61,12 @@ export async function add(req: Request, res: Response) {
 
 export async function update(req: Request, res: Response) {
   try {
-    const cliente = await service.actualizarCliente(Number(req.params.id), req.body.clienteInput);
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'El ID provisto debe ser un número entero válido' });
+    }
+
+    const cliente = await service.actualizarCliente(id, req.body.clienteInput);
     return res.status(200).json({ message: 'Cliente actualizado', data: cliente });
   } catch (error) {
     return handleError(res, error);
@@ -60,7 +75,12 @@ export async function update(req: Request, res: Response) {
 
 export async function remove(req: Request, res: Response) {
   try {
-    await service.eliminarCliente(Number(req.params.id));
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'El ID provisto debe ser un número entero válido' });
+    }
+
+    await service.eliminarCliente(id);
     return res.status(200).json({ message: 'Cliente eliminado exitosamente' });
   } catch (error) {
     return handleError(res, error);

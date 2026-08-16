@@ -29,13 +29,17 @@ export async function findAll(req: Request, res: Response) {
 
 export async function findOne(req: Request, res: Response) {
   try {
-    const envio = await service.buscarEnvio(Number(req.params.id));
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'El ID provisto debe ser un número entero válido' });
+    }
+
+    const envio = await service.buscarEnvio(id);
     return res.status(200).json({ data: envio });
   } catch (error) {
     return handleError(res, error);
   }
 }
-
 export async function add(req: Request, res: Response) {
   try {
     const nuevoEnvio = await service.crearEnvio(req.body.envioInput);
@@ -47,7 +51,12 @@ export async function add(req: Request, res: Response) {
 
 export async function update(req: Request, res: Response) {
   try {
-    const envio = await service.actualizarEnvio(Number(req.params.id), req.body.envioInput);
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'El ID provisto debe ser un número entero válido' });
+    }
+
+    const envio = await service.actualizarEnvio(id, req.body.envioInput);
     return res.status(200).json({ message: 'Envío actualizado', data: envio });
   } catch (error) {
     return handleError(res, error);
@@ -56,7 +65,12 @@ export async function update(req: Request, res: Response) {
 
 export async function remove(req: Request, res: Response) {
   try {
-    await service.eliminarEnvio(Number(req.params.id));
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'El ID provisto debe ser un número entero válido' });
+    }
+
+    await service.eliminarEnvio(id);
     return res.status(200).json({ message: 'Envío eliminado exitosamente' });
   } catch (error) {
     return handleError(res, error);

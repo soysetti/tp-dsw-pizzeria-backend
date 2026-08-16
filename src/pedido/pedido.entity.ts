@@ -1,4 +1,4 @@
-import { Entity, Property, OneToMany, OneToOne, ManyToOne, Collection, Rel } from '@mikro-orm/core';
+import { Entity, Property, OneToMany, OneToOne, ManyToOne, Collection, Rel, Cascade } from '@mikro-orm/core';
 import { BaseEntity } from '../shared/db/base.entity.js';
 import { DetallePedido } from '../detalle-pedido/detalle-pedido.entity.js';
 import { Envio } from '../envio/envio.entity.js';
@@ -19,7 +19,10 @@ export class Pedido extends BaseEntity {
   @Property({ type: 'string' })
   estado: string = 'Pendiente';
 
-  @OneToMany(() => DetallePedido, (detalle) => detalle.pedido)
+  @OneToMany(() => DetallePedido, (detalle) => detalle.pedido, {
+    cascade: [Cascade.ALL],
+    orphanRemoval: true,
+  })
   detalles = new Collection<DetallePedido>(this);
 
   @OneToOne(() => Envio, (envio) => envio.pedido, { nullable: true })
