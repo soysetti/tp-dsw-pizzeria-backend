@@ -1,5 +1,6 @@
 import 'reflect-metadata'; 
 import express from 'express';
+import cors from 'cors';
 import { RequestContext } from '@mikro-orm/core';
 import { orm, syncSchema } from './shared/db/orm.js';
 import { ingredienteRouter } from './ingrediente/ingrediente.routes.js';
@@ -13,6 +14,7 @@ import { clienteRouter } from './cliente/cliente.routes.js';
 
 
 const app = express();
+app.use(cors());
 app.use(express.json()); // Middleware para parsear JSONs en el body
 
 // Sincronizamos la base de datos automáticamente al arrancar
