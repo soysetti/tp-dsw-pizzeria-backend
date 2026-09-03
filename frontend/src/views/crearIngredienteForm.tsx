@@ -44,55 +44,42 @@ export default function CrearIngredienteForm({ onIngredienteCreado }: Props) {
   };
 
   return (
-    <div style={{
-      backgroundColor: '#f9f9f9',
-      padding: '15px',
-      borderRadius: '8px',
-      marginBottom: '20px',
-      border: '1px solid #ddd',
-    }}>
+    <div className="crear-ingrediente-form">
       <h3>➕ Agregar Nuevo Ingrediente</h3>
 
-      {error && <p style={{ color: 'red', fontWeight: 'bold' }}>⚠️ {error}</p>}
+      {error && <p className="form-error">⚠️ {error}</p>}
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-        <div style={{ flex: '1 1 200px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Nombre:</label>
+      <form onSubmit={handleSubmit} className="form">
+        <div className="form-group">
+          <label>Nombre:</label>
           <input
             type="text"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             placeholder="Ej. Jamón"
             disabled={submitting}
-            style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+            className="form-input"
           />
         </div>
 
-        <div style={{ flex: '1 1 100px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Stock Inicial:</label>
+        <div className="form-group-small">
+          <label>Stock:</label>
           <input
             type="number"
             value={stock}
             onChange={(e) => setStock(Number(e.target.value))}
             min="0"
+            step="0.01"
             disabled={submitting}
-            style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+            className="form-input"
           />
         </div>
 
-        <div style={{ flex: '1 1 100%', marginTop: '10px' }}>
+        <div className="form-actions">
           <button
             type="submit"
             disabled={submitting}
-            style={{
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              border: 'none',
-              padding: '10px 15px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-            }}
+            className="btn-submit"
           >
             {submitting ? 'Guardando...' : 'Guardar Ingrediente'}
           </button>

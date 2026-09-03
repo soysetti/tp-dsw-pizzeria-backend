@@ -1,5 +1,3 @@
-// src/interfaces/Ingrediente.ts
-
 export interface Ingrediente {
   id: number;
   nombre: string;

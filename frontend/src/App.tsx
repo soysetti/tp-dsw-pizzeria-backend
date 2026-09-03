@@ -1,16 +1,41 @@
-import IngredientesList from './views/ingredienteList';
+import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
+import IngredientesList from './views/IngredientesList';
+import RepartidorList from './views/repartidorList';
+import logo from './assets/logo.png';
+import './App.css';
 
 function App() {
   return (
-    <main style={{ maxWidth: '800px', margin: '0 auto', padding: '20px', fontFamily: 'sans-serif' }}>
-      <header style={{ borderBottom: '2px solid #eee', marginBottom: '20px', paddingBottom: '10px' }}>
-        <h1>🍕 Pizzería "Due paffutelli"</h1>
-      </header>
+    <BrowserRouter>
+      <main className="app-container">
+        <header className="app-header">
+          <img src={logo} alt="Pizzería Due Paffutelli" className="app-logo" />
+        </header>
 
-      <section>
-        <IngredientesList />
-      </section>
-    </main>
+        <nav className="app-nav">
+          <NavLink
+            to="/ingredientes"
+            className={({ isActive }) => (isActive ? 'nav-link nav-link-active' : 'nav-link')}
+          >
+            Ingredientes
+          </NavLink>
+          <NavLink
+            to="/repartidores"
+            className={({ isActive }) => (isActive ? 'nav-link nav-link-active' : 'nav-link')}
+          >
+            Repartidores
+          </NavLink>
+        </nav>
+
+        <section>
+          <Routes>
+            <Route path="/" element={<IngredientesList />} />
+            <Route path="/ingredientes" element={<IngredientesList />} />
+            <Route path="/repartidores" element={<RepartidorList />} />
+          </Routes>
+        </section>
+      </main>
+    </BrowserRouter>
   );
 }
 
