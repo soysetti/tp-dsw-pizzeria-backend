@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
 import IngredientesList from './views/IngredientesList';
 import RepartidorList from './views/repartidorList';
+import PizzaList from './views/pizzaList';
+import PizzaDetalle from './views/pizzaDetalle';
 import logo from './assets/logo.png';
 import './App.css';
 
@@ -25,6 +27,12 @@ function App() {
           >
             Repartidores
           </NavLink>
+          <NavLink
+            to="/pizzas"
+            className={({ isActive }) => (isActive ? 'nav-link nav-link-active' : 'nav-link')}
+          >
+            Pizzas
+          </NavLink>
         </nav>
 
         <section>
@@ -32,6 +40,8 @@ function App() {
             <Route path="/" element={<IngredientesList />} />
             <Route path="/ingredientes" element={<IngredientesList />} />
             <Route path="/repartidores" element={<RepartidorList />} />
+            <Route path="/pizzas" element={<PizzaList />} />
+            <Route path="/pizzas/:id" element={<PizzaDetalle />} />
           </Routes>
         </section>
       </main>

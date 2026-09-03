@@ -57,7 +57,7 @@ export default function CrearRepartidorForm({ onRepartidorCreado }: Props) {
 
   return (
     <div className="crear-ingrediente-form">
-      <h3>➕ Agregar Nuevo Repartidor</h3>
+      <h3> + Agregar Nuevo Repartidor</h3>
 
       {error && <p className="form-error">⚠️ {error}</p>}
 

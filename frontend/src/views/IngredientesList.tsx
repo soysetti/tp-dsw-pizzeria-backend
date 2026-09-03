@@ -16,6 +16,8 @@ export default function IngredientesList() {
   const [nombreEditado, setNombreEditado] = useState<string>('');
   const [stockEditado, setStockEditado] = useState<number>(0);
 
+  const [confirmandoEliminarId, setConfirmandoEliminarId] = useState<number | null>(null);
+
   useEffect(() => {
     cargarIngredientes();
   }, []);
@@ -34,14 +36,21 @@ export default function IngredientesList() {
     }
   };
 
-  const handleEliminar = async (id: number) => {
-    if (!window.confirm('¿Estás seguro de que querés eliminar este ingrediente?')) return;
+  const handleSolicitarEliminar = (id: number) => {
+    setConfirmandoEliminarId(id);
+  };
 
+  const handleCancelarEliminar = () => {
+    setConfirmandoEliminarId(null);
+  };
+
+  const handleConfirmarEliminar = async (id: number) => {
     try {
       await eliminarIngrediente(id);
       setIngredientes((prev) => prev.filter((item) => item.id !== id));
+      setConfirmandoEliminarId(null);
     } catch (err) {
-      alert('Error al intentar eliminar el ingrediente.');
+      setError('Error al intentar eliminar el ingrediente.');
       console.error(err);
     }
   };
@@ -60,11 +69,11 @@ export default function IngredientesList() {
 
   const handleGuardarCambios = async (id: number) => {
     if (!nombreEditado.trim()) {
-      alert('El nombre no puede estar vacío.');
+      setError('El nombre no puede estar vacío.');
       return;
     }
     if (stockEditado < 0) {
-      alert('El stock no puede ser negativo.');
+      setError('El stock no puede ser negativo.');
       return;
     }
     try {
@@ -76,8 +85,9 @@ export default function IngredientesList() {
         prev.map((item) => (item.id === id ? ingredienteActualizado : item))
       );
       setEditandoId(null);
+      setError(null);
     } catch (err) {
-      alert('No se pudo actualizar el ingrediente.');
+      setError('No se pudo actualizar el ingrediente.');
       console.error(err);
     }
   };
@@ -90,7 +100,7 @@ export default function IngredientesList() {
 
   return (
     <div className="ingredientes-container">
-      <h2>📦 Gestión de Stock de Ingredientes</h2>
+      <h2> Gestión de Stock de Ingredientes</h2>
 
       <CrearIngredienteForm onIngredienteCreado={handleIngredienteCreado} />
 
@@ -149,11 +159,22 @@ export default function IngredientesList() {
                       </button>
                       <button onClick={handleCancelarEdicion}>Cancelar</button>
                     </>
+                  ) : confirmandoEliminarId === ing.id ? (
+                    <>
+                      <span className="confirmar-texto">¿Eliminar?</span>
+                      <button
+                        onClick={() => handleConfirmarEliminar(ing.id)}
+                        className="btn-eliminar"
+                      >
+                        Sí
+                      </button>
+                      <button onClick={handleCancelarEliminar}>No</button>
+                    </>
                   ) : (
                     <>
                       <button onClick={() => handleIniciarEdicion(ing)}>Editar</button>
                       <button
-                        onClick={() => handleEliminar(ing.id)}
+                        onClick={() => handleSolicitarEliminar(ing.id)}
                         className="btn-eliminar"
                       >
                         Eliminar

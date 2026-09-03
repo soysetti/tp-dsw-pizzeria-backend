@@ -18,6 +18,8 @@ export default function RepartidorList() {
   const [matriculaEditada, setMatriculaEditada] = useState('');
   const [estadoEditado, setEstadoEditado] = useState(true);
 
+  const [confirmandoEliminarId, setConfirmandoEliminarId] = useState<number | null>(null);
+
   useEffect(() => {
     cargarRepartidores();
   }, []);
@@ -36,14 +38,21 @@ export default function RepartidorList() {
     }
   };
 
-  const handleEliminar = async (id: number) => {
-    if (!window.confirm('¿Estás seguro de que querés eliminar este repartidor?')) return;
+  const handleSolicitarEliminar = (id: number) => {
+    setConfirmandoEliminarId(id);
+  };
 
+  const handleCancelarEliminar = () => {
+    setConfirmandoEliminarId(null);
+  };
+
+  const handleConfirmarEliminar = async (id: number) => {
     try {
       await eliminarRepartidor(id);
       setRepartidores((prev) => prev.filter((item) => item.id !== id));
+      setConfirmandoEliminarId(null);
     } catch (err) {
-      alert('Error al intentar eliminar el repartidor.');
+      setError('Error al intentar eliminar el repartidor.');
       console.error(err);
     }
   };
@@ -62,7 +71,7 @@ export default function RepartidorList() {
 
   const handleGuardarCambios = async (id: number) => {
     if (!nombreEditado.trim() || !apellidoEditado.trim() || !matriculaEditada.trim()) {
-      alert('Los campos no pueden estar vacíos.');
+      setError('Los campos no pueden estar vacíos.');
       return;
     }
     try {
@@ -76,8 +85,9 @@ export default function RepartidorList() {
         prev.map((item) => (item.id === id ? repartidorActualizado : item))
       );
       setEditandoId(null);
+      setError(null);
     } catch (err) {
-      alert('No se pudo actualizar el repartidor.');
+      setError('No se pudo actualizar el repartidor.');
       console.error(err);
     }
   };
@@ -90,7 +100,7 @@ export default function RepartidorList() {
 
   return (
     <div className="ingredientes-container">
-      <h2>🛵 Gestión de Repartidores</h2>
+      <h2>Gestión de Repartidores</h2>
 
       <CrearRepartidorForm onRepartidorCreado={handleRepartidorCreado} />
 
@@ -173,10 +183,21 @@ export default function RepartidorList() {
                       </button>
                       <button onClick={handleCancelarEdicion}>Cancelar</button>
                     </>
+                  ) : confirmandoEliminarId === rep.id ? (
+                    <>
+                      <span className="confirmar-texto">¿Eliminar?</span>
+                      <button
+                        onClick={() => handleConfirmarEliminar(rep.id)}
+                        className="btn-eliminar"
+                      >
+                        Sí
+                      </button>
+                      <button onClick={handleCancelarEliminar}>No</button>
+                    </>
                   ) : (
                     <>
                       <button onClick={() => handleIniciarEdicion(rep)}>Editar</button>
-                      <button onClick={() => handleEliminar(rep.id)} className="btn-eliminar">
+                      <button onClick={() => handleSolicitarEliminar(rep.id)} className="btn-eliminar">
                         Eliminar
                       </button>
                     </>

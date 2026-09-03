@@ -1,78 +1,184 @@
+:root {
+  --color-bg: #FBF8F2;
+  --color-surface: #FFFFFF;
+  --color-text: #2A1418;
+  --color-text-muted: #6B5850;
+  --color-primary: #6B1220;
+  --color-primary-dark: #4E0D18;
+  --color-accent: #B8923F;
+  --color-border: #EAE0C8;
+  --color-danger: #A13327;
+  --color-danger-bg: #F5E4E0;
+
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Inter', sans-serif;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow-card: 0 2px 12px rgba(42, 20, 24, 0.08);
+}
+
 /* Layout general */
 .app-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
-  font-family: sans-serif;
+  padding: 32px 24px;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background-color: var(--color-bg);
 }
 
 .app-header {
-  border-bottom: 2px solid #eee;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   display: flex;
   justify-content: center;
 }
 
 .app-logo {
-  height: 160px;
-  width: 160px;
+  height: 140px;
+  width: 140px;
   border-radius: 50%;
   object-fit: cover;
+  box-shadow: var(--shadow-card);
 }
 
-/* Lista de ingredientes */
+/* Navegación */
+.app-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.nav-link {
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  transition: background-color 0.15s ease;
+}
+
+.nav-link:hover {
+  background-color: var(--color-bg);
+}
+
+.nav-link-active {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* Títulos */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  color: var(--color-text);
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+h2 {
+  font-size: 24px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-accent);
+  display: inline-block;
+}
+
+h3 {
+  font-size: 18px;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+/* Contenedores de listas */
 .ingredientes-container {
   width: 100%;
 }
 
 .error-message {
-  color: red;
-  background-color: #ffe6e6;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 15px;
+  color: var(--color-danger);
+  background-color: var(--color-danger-bg);
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  font-size: 14px;
 }
 
+/* Tablas */
 .ingredientes-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
+  margin-top: 12px;
+  background-color: var(--color-surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
 }
 
 .ingredientes-table thead tr {
-  background-color: #f2f2f2;
+  background-color: var(--color-text);
   text-align: left;
+}
+
+.ingredientes-table thead th {
+  color: white;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.02em;
 }
 
 .ingredientes-table th,
 .ingredientes-table td {
-  padding: 8px;
+  padding: 12px 14px;
   vertical-align: middle;
   line-height: 1.4;
 }
 
 .ingredientes-table tbody tr {
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ingredientes-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.ingredientes-table tbody tr:hover {
+  background-color: var(--color-bg);
 }
 
 .stock-value {
   margin: 0 10px;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 /* Botones dentro de la tabla */
 .ingredientes-table td button {
-  padding: 6px 12px;
+  padding: 7px 14px;
   margin-right: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #f2f2f2;
-  color: #000;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text);
   cursor: pointer;
-  font-size: 14px;
-  line-height: 1.2;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
   box-sizing: border-box;
+  transition: background-color 0.15s ease;
+}
+
+.ingredientes-table td button:hover {
+  background-color: var(--color-bg);
 }
 
 .ingredientes-table td button:last-child {
@@ -80,29 +186,35 @@
 }
 
 .ingredientes-table td button.btn-eliminar {
-  background-color: #ff4d4d !important;
-  border: 1px solid #ff4d4d !important;
-  color: #fff !important;
+  background-color: var(--color-danger-bg) !important;
+  border: 1px solid var(--color-danger) !important;
+  color: var(--color-danger) !important;
 }
 
-/* Formulario crear ingrediente */
+.ingredientes-table td button.btn-eliminar:hover {
+  background-color: var(--color-danger) !important;
+  color: white !important;
+}
+
+/* Formulario crear */
 .crear-ingrediente-form {
-  background-color: #f9f9f9;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  border: 1px solid #ddd;
+  background-color: var(--color-surface);
+  padding: 24px;
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-card);
 }
 
 .form-error {
-  color: red;
-  font-weight: bold;
+  color: var(--color-danger);
+  font-weight: 600;
+  font-size: 14px;
 }
 
 .form {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 10px;
+  gap: 16px;
   align-items: start;
 }
 
@@ -114,35 +226,83 @@
 
 .form-group label,
 .form-group-small label {
-  margin-bottom: 5px;
+  margin-bottom: 6px;
   line-height: 1.4;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
 }
 
 .form-input {
   width: 100%;
-  padding: 8px;
+  padding: 10px 12px;
   box-sizing: border-box;
+  font-family: var(--font-body);
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background-color: var(--color-surface);
 }
 
 .form-actions {
   grid-column: 1 / -1;
-  margin-top: 10px;
+  margin-top: 6px;
 }
 
 .btn-submit {
-  background-color: #4CAF50;
+  background-color: var(--color-primary);
   color: white;
   border: none;
-  padding: 10px 15px;
-  border-radius: 4px;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-weight: bold;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 14px;
+  transition: background-color 0.15s ease;
+}
+
+.btn-submit:hover {
+  background-color: var(--color-primary-dark);
+}
+
+/* Password toggle (Repartidor) */
+.password-wrapper {
+  display: flex;
+  gap: 6px;
+}
+
+.password-wrapper .form-input {
+  flex: 1;
+}
+
+.btn-toggle-password {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 /* Responsive - Mobile first */
 @media (max-width: 768px) {
   .app-container {
-    padding: 10px;
+    padding: 16px;
+  }
+
+  .app-logo {
+    height: 100px;
+    width: 100px;
   }
 
   .form {
@@ -150,32 +310,11 @@
   }
 
   .ingredientes-table {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .ingredientes-table th,
   .ingredientes-table td {
-    padding: 5px;
+    padding: 8px;
   }
-
- .app-nav {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-}
-
-.nav-link {
-  padding: 8px 16px;
-  border-radius: 4px;
-  text-decoration: none;
-  color: #333;
-  font-weight: bold;
-  background-color: #f2f2f2;
-}
-
-.nav-link-active {
-  background-color: #4CAF50;
-  color: white;
 }
