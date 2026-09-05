@@ -8,6 +8,7 @@ export default function PizzaList() {
   const [pizzas, setPizzas] = useState<Pizza[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState<boolean>(true);
+  const [filtro, setFiltro] = useState('');
 
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [nombreEditado, setNombreEditado] = useState('');
@@ -78,18 +79,33 @@ export default function PizzaList() {
     setPizzas((prev) => [...prev, nueva]);
   };
 
+  const pizzasFiltradas = pizzas.filter((p) =>
+    p.nombre.toLowerCase().includes(filtro.toLowerCase())
+  );
+
   if (cargando) return <p>Cargando pizzas...</p>;
 
   return (
     <div className="ingredientes-container">
-      <h2> Gestión de Pizzas</h2>
+      <h2>🍕 Gestión de Pizzas</h2>
 
       <CrearPizzaForm onPizzaCreada={handlePizzaCreada} />
 
       {error && <div className="error-message">⚠️ {error}</div>}
 
-      {pizzas.length === 0 && !error ? (
-        <p>No hay pizzas registradas.</p>
+      <div className="form-group filtro-container">
+        <label>🔍 Buscar por nombre:</label>
+        <input
+          type="text"
+          placeholder="Ej. Muzzarella"
+          value={filtro}
+          onChange={(e) => setFiltro(e.target.value)}
+          className="form-input"
+        />
+      </div>
+
+      {pizzasFiltradas.length === 0 && !error ? (
+        <p>{pizzas.length === 0 ? 'No hay pizzas registradas.' : 'No se encontraron pizzas con ese nombre.'}</p>
       ) : (
         <table className="ingredientes-table">
           <thead>
@@ -102,7 +118,7 @@ export default function PizzaList() {
             </tr>
           </thead>
           <tbody>
-            {pizzas.map((p) => (
+            {pizzasFiltradas.map((p) => (
               <tr key={p.id}>
                 <td>
                   {editandoId === p.id ? (
