@@ -43,3 +43,8 @@ export async function actualizarEstadoPedido(id: number, estado: string): Promis
   const body: ApiResponse<Pedido> = await response.json();
   return body.data;
 }
+
+export async function eliminarPedido(id: number): Promise<void> {
+  const response = await fetch(`${API_URL}/pedidos/${id}`, { method: 'DELETE' });
+  if (!response.ok) throw new Error(`Error al eliminar el pedido ${id}: ${response.status}`);
+}

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import type { Repartidor } from '../interfaces/repartidor';
+import type { Repartidor } from '../../interfaces/repartidor';
 import {
   getRepartidores,
   eliminarRepartidor,
   actualizarRepartidor,
-} from '../services/repartidorService';
+} from '../../services/repartidorService';
 import CrearRepartidorForm from './crearRepartidorForm';
 
 export default function RepartidorList() {

@@ -2,11 +2,15 @@ import { Pedido } from './pedido.entity.js';
 import { PedidoRepository, ItemPedidoInput } from './pedido.repository.js';
 import { PizzaRepository } from '../pizza/pizza.repository.js';
 import { ClienteRepository } from '../cliente/cliente.repository.js';
+import { DetallePedidoRepository } from '../detalle-pedido/detalle-pedido.repository.js';
+import { EnvioRepository } from '../envio/envio.repository.js';
 import { HttpError } from '../shared/http-error.js';
 
 const repository = new PedidoRepository();
 const pizzaRepository = new PizzaRepository();
 const clienteRepository = new ClienteRepository();
+const detallePedidoRepository = new DetallePedidoRepository();
+const envioRepository = new EnvioRepository();
 
 interface ItemInput {
   pizzaId: number;
@@ -72,6 +76,21 @@ export async function actualizarPedido(
 }
 
 export async function eliminarPedido(id: number): Promise<void> {
+  const pedido = await repository.findOne(id);
+  if (!pedido) throw new HttpError(404, 'Pedido no encontrado');
+
+  // Cascade manual: primero los detalles (ítems), después el envío si existe
+  const detalles = await detallePedidoRepository.findByPedido(id);
+  for (const detalle of detalles) {
+    await detallePedidoRepository.delete(id, detalle.pizza.id);
+  }
+
+  const envios = await envioRepository.findAll();
+  const envioDelPedido = envios.find((e) => e.pedido.id === id);
+  if (envioDelPedido) {
+    await envioRepository.delete(envioDelPedido.id);
+  }
+
   const eliminado = await repository.delete(id);
   if (!eliminado) throw new HttpError(404, 'Pedido no encontrado');
 }

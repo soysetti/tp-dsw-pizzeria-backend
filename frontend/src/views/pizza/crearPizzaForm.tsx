@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import type { NuevaPizza, Pizza } from '../interfaces/pizza';
-import { crearPizza } from '../services/pizzaService';
+import type { NuevaPizza, Pizza } from '../../interfaces/pizza';
+import { crearPizza } from '../../services/pizzaService';
 
 interface Props {
   onPizzaCreada: (nueva: Pizza) => void;
 }
+
 
 export default function CrearPizzaForm({ onPizzaCreada }: Props) {
   const [nombre, setNombre] = useState('');

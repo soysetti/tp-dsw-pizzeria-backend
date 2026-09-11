@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import type { Cliente } from '../interfaces/cliente';
-import type { Pizza } from '../interfaces/pizza';
-import type { ItemPedido, Pedido } from '../interfaces/pedido';
-import { getClientes } from '../services/clienteService';
-import { getPizzas } from '../services/pizzaService';
-import { crearPedido } from '../services/pedidoService';
+import type { Cliente } from '../../interfaces/cliente';
+import type { Pizza } from '../../interfaces/pizza';
+import type { ItemPedido, Pedido } from '../../interfaces/pedido';
+import { getClientes } from '../../services/clienteService';
+import { getPizzas } from '../../services/pizzaService';
+import { crearPedido } from '../../services/pedidoService';
 
 interface ItemCarrito extends ItemPedido {
   nombrePizza: string;

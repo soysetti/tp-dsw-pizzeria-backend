@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import type { Ingrediente } from '../interfaces/ingrediente';
+import type { Ingrediente } from '../../interfaces/ingrediente';
 import {
   getIngredientes,
   eliminarIngrediente,
   actualizarIngrediente,
-} from '../services/ingredienteService';
+} from '../../services/ingredienteService';
 import CrearIngredienteForm from './crearIngredienteForm';
 
 export default function IngredientesList() {

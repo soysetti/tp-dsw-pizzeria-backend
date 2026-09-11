@@ -1,4 +1,4 @@
-import { RequiredEntityData } from '@mikro-orm/core';
+import { RequiredEntityData, EntityData } from '@mikro-orm/core';
 import { orm } from '../shared/db/orm.js';
 import { Pedido } from './pedido.entity.js';
 import { Pizza } from '../pizza/pizza.entity.js';
@@ -18,7 +18,7 @@ export class PedidoRepository implements Repository<Pedido> {
   }
 
   async findOne(id: number): Promise<Pedido | null> {
-    return orm.em.findOne(Pedido, { id }, { populate: ['detalles', 'detalles.pizza', 'cliente'] });
+    return orm.em.findOne(Pedido, { id }, { populate: ['detalles', 'detalles.pizza', 'cliente', 'repartidor'] });
   }
 
   async add(item: Pedido): Promise<Pedido> {
@@ -67,8 +67,8 @@ export class PedidoRepository implements Repository<Pedido> {
     return pedido;
   }
 
-  async update(id: number, item: Partial<Pedido>): Promise<Pedido | null> {
-    const pedido = await orm.em.findOne(Pedido, { id });
+  async update(id: number, item: EntityData<Pedido>): Promise<Pedido | null> {
+    const pedido = await orm.em.findOne(Pedido, { id }, { populate: ['detalles', 'detalles.pizza', 'cliente', 'repartidor'] });
     if (!pedido) return null;
     orm.em.assign(pedido, item);
     await orm.em.flush();

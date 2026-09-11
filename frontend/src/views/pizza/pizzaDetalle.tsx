@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import type { Ingrediente } from '../interfaces/ingrediente';
-import type { IngredientePizza } from '../interfaces/ingredientePizza';
-import { getIngredientes } from '../services/ingredienteService';
+import type { Ingrediente } from '../../interfaces/ingrediente';
+import type { IngredientePizza } from '../../interfaces/ingredientePizza';
+import { getIngredientes } from '../../services/ingredienteService';
 import {
   getIngredientesDePizza,
   agregarIngredienteAPizza,
   actualizarCantidad,
   quitarIngredienteDePizza,
-} from '../services/ingredientePizzaService';
+} from '../../services/ingredientePizzaService';
 
 export default function PizzaDetalle() {
   const { id } = useParams<{ id: string }>();

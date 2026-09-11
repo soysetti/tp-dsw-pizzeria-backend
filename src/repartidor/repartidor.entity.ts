@@ -8,7 +8,7 @@ export class Repartidor extends Persona {
     matricula!: string;
 
     @Property({ type: 'double' })
-    monto_propina_total!: number;
+    monto_propina_total!: number; //cambiar esto, no es estrictamente necesario//
 
     @OneToMany(() => Pedido, (pedido) => pedido.repartidor)
     pedidos = new Collection<Pedido>(this);

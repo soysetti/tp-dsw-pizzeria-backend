@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import type { NuevoRepartidor, Repartidor } from '../interfaces/repartidor';
-import { crearRepartidor } from '../services/repartidorService';
+import type { NuevoRepartidor, Repartidor } from '../../interfaces/repartidor';
+import { crearRepartidor } from '../../services/repartidorService';
 
 interface Props {
   onRepartidorCreado: (nuevo: Repartidor) => void;

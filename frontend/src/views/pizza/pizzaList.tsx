@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { Pizza } from '../interfaces/pizza';
-import { getPizzas, eliminarPizza, actualizarPizza } from '../services/pizzaService';
+import type { Pizza } from '../../interfaces/pizza';
+import { getPizzas, eliminarPizza, actualizarPizza } from '../../services/pizzaService';
 import CrearPizzaForm from './crearPizzaForm';
 
 export default function PizzaList() {
@@ -87,7 +87,7 @@ export default function PizzaList() {
 
   return (
     <div className="ingredientes-container">
-      <h2>🍕 Gestión de Pizzas</h2>
+      <h2> Gestión de Pizzas</h2>
 
       <CrearPizzaForm onPizzaCreada={handlePizzaCreada} />
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import type { NuevoIngrediente, Ingrediente } from '../interfaces/ingrediente';
-import { crearIngrediente } from '../services/ingredienteService';
+import type { NuevoIngrediente, Ingrediente } from '../../interfaces/ingrediente';
+import { crearIngrediente } from '../../services/ingredienteService';
 
 interface Props {
   onIngredienteCreado: (nuevo: Ingrediente) => void;

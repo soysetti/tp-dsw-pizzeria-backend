@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { Pedido } from '../interfaces/pedido';
-import { ESTADOS_PEDIDO } from '../interfaces/pedido';
-import { getPedidos } from '../services/pedidoService';
+import type { Pedido } from '../../interfaces/pedido';
+import { ESTADOS_PEDIDO } from '../../interfaces/pedido';
+import { getPedidos } from '../../services/pedidoService';
 
 export default function PedidoList() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -33,7 +33,7 @@ export default function PedidoList() {
 
   return (
     <div className="ingredientes-container">
-      <h2>📋 Pedidos</h2>
+      <h2> Pedidos</h2>
 
       <div className="form-group filtro-container">
         <label>Filtrar por estado:</label>
