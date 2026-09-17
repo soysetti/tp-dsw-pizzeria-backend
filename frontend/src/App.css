@@ -1,25 +1,94 @@
 :root {
-  --color-bg: #FBF8F2;
+  --color-bg: #FAF6EF;
   --color-surface: #FFFFFF;
   --color-text: #2A1418;
   --color-text-muted: #6B5850;
   --color-primary: #6B1220;
   --color-primary-dark: #4E0D18;
-  --color-accent: #B8923F;
-  --color-border: #EAE0C8;
+  --color-accent: #5C7A4E;
+  --color-gold: #B8923F;
+  --color-border: #D8CDB8;
   --color-danger: #A13327;
   --color-danger-bg: #F5E4E0;
 
   --font-display: 'Fraunces', serif;
   --font-body: 'Inter', sans-serif;
 
-  --radius: 10px;
-  --radius-sm: 6px;
-  --shadow-card: 0 2px 12px rgba(42, 20, 24, 0.08);
+  --radius: 12px;
+  --radius-sm: 7px;
+  --shadow-card: 0 12px 32px -20px rgba(42, 20, 24, 0.4);
 }
 
+/* ============================================
+   NAVBAR — barra completa, de punta a punta
+   ============================================ */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background-color: var(--color-text);
+  border-bottom: 3px solid var(--color-primary);
+}
 
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: white !important;
+  text-decoration: none;
+}
 
+.navbar-logo-img {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.navbar-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.1rem;
+}
+
+.navbar-links a {
+  color: white !important;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.navbar-links a:hover,
+.navbar-links a.active {
+  color: var(--color-gold) !important;
+}
+
+@media (min-width: 768px) {
+  .navbar {
+    padding: 1.1rem 2.5rem;
+  }
+
+  .navbar-logo {
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .navbar-links {
+    gap: 2rem;
+  }
+}
+
+/* ============================================
+   Contenido de página (debajo de la navbar)
+   ============================================ */
 .app-container {
   max-width: 100%;
   margin: 0 auto;
@@ -27,55 +96,11 @@
   font-family: var(--font-body);
   color: var(--color-text);
   background-color: var(--color-bg);
+  min-height: calc(100vh - 70px);
 }
 
-.app-header {
-  border-bottom: 1px solid var(--color-border);
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  display: flex;
-  justify-content: center;
-}
-
-.app-logo {
-  height: 90px;
-  width: 90px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: var(--shadow-card);
-}
-
-.app-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.nav-link {
-  padding: 10px 16px;
-  border-radius: var(--radius-sm);
-  text-decoration: none;
-  color: var(--color-text);
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 14px;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  text-align: center;
-  transition: background-color 0.15s ease;
-}
-
-.nav-link:hover {
-  background-color: var(--color-bg);
-}
-
-.nav-link-active {
-  background-color: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
+.ingredientes-container {
+  width: 100%;
 }
 
 h1, h2, h3 {
@@ -89,8 +114,9 @@ h2 {
   font-size: 20px;
   margin-bottom: 14px;
   padding-bottom: 8px;
-  border-bottom: 2px solid var(--color-accent);
+  border-bottom: 2px solid var(--color-gold);
   display: inline-block;
+  letter-spacing: -0.01em;
 }
 
 h3 {
@@ -100,8 +126,32 @@ h3 {
   color: var(--color-primary);
 }
 
-.ingredientes-container {
-  width: 100%;
+/* Link genérico tipo "botón chico" — usado suelto en vistas
+   (ej: "Ver detalle", "← Volver", link a Ingredientes de una pizza),
+   NO es el de la navbar. */
+.nav-link {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13px;
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-border);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.nav-link:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg);
+}
+
+.nav-link-active {
+  background-color: var(--color-primary);
+  color: white !important;
+  border-color: var(--color-primary);
 }
 
 .error-message {
@@ -111,9 +161,12 @@ h3 {
   border-radius: var(--radius-sm);
   margin-bottom: 16px;
   font-size: 14px;
+  border-left: 4px solid var(--color-danger);
 }
 
-
+/* ============================================
+   Tablas
+   ============================================ */
 .ingredientes-table {
   display: block;
   overflow-x: auto;
@@ -121,6 +174,7 @@ h3 {
   border-collapse: collapse;
   margin-top: 12px;
   background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-card);
 }
@@ -134,14 +188,15 @@ h3 {
   color: white;
   font-family: var(--font-body);
   font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.02em;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
 .ingredientes-table th,
 .ingredientes-table td {
-  padding: 10px 12px;
+  padding: 12px;
   vertical-align: middle;
   line-height: 1.4;
 }
@@ -164,10 +219,10 @@ h3 {
 }
 
 .ingredientes-table td button {
-  padding: 7px 12px;
-  margin-right: 6px;
+  padding: 8px 14px;
+  margin-right: 8px;
   margin-bottom: 4px;
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-sm);
   background-color: var(--color-surface);
   color: var(--color-text);
@@ -176,11 +231,11 @@ h3 {
   font-size: 13px;
   font-weight: 600;
   box-sizing: border-box;
-  transition: background-color 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .ingredientes-table td button:hover {
-  background-color: var(--color-bg);
+  border-color: var(--color-primary);
 }
 
 .ingredientes-table td button:last-child {
@@ -189,7 +244,7 @@ h3 {
 
 .ingredientes-table td button.btn-eliminar {
   background-color: var(--color-danger-bg) !important;
-  border: 1px solid var(--color-danger) !important;
+  border: 2px solid var(--color-danger) !important;
   color: var(--color-danger) !important;
 }
 
@@ -198,9 +253,13 @@ h3 {
   color: white !important;
 }
 
+/* ============================================
+   Formularios
+   ============================================ */
 .crear-ingrediente-form {
   background-color: var(--color-surface);
-  padding: 16px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius);
   margin-bottom: 20px;
   box-shadow: var(--shadow-card);
@@ -212,11 +271,13 @@ h3 {
   font-size: 14px;
 }
 
-
 .form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 2px solid var(--color-border);
 }
 
 .form-group,
@@ -224,14 +285,15 @@ h3 {
   display: flex;
   flex-direction: column;
   width: 100%;
+  gap: 4px;
 }
 
 .form-group label,
 .form-group-small label {
-  margin-bottom: 6px;
-  line-height: 1.4;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--color-text-muted);
 }
 
@@ -241,16 +303,18 @@ h3 {
   box-sizing: border-box;
   font-family: var(--font-body);
   font-size: 14px;
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-sm);
   background-color: var(--color-bg);
   color: var(--color-text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
 .form-input:focus {
   outline: none;
   border-color: var(--color-primary);
   background-color: var(--color-surface);
+  box-shadow: 0 0 0 3px rgba(107, 18, 32, 0.15);
 }
 
 .form-actions {
@@ -267,12 +331,17 @@ h3 {
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 14px;
+  letter-spacing: 0.02em;
   width: 100%;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.15s ease, transform 0.05s ease;
 }
 
 .btn-submit:hover {
   background-color: var(--color-primary-dark);
+}
+
+.btn-submit:active {
+  transform: translateY(1px);
 }
 
 .password-wrapper {
@@ -286,7 +355,7 @@ h3 {
 
 .btn-toggle-password {
   padding: 8px 12px;
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-sm);
   background-color: var(--color-bg);
   cursor: pointer;
@@ -299,23 +368,130 @@ h3 {
   margin-bottom: 16px;
 }
 
+.badge-estado {
+  display: inline-block;
+  padding: 3px 12px;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
 
+/* ============================================
+   Detalle (Pizza / Pedido) — estilo tipo "ficha"
+   ============================================ */
+.detalle-volver {
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.detalle-volver:hover {
+  text-decoration: underline;
+}
+
+.detalle-card {
+  margin-top: 1rem;
+  margin-bottom: 20px;
+  padding: 0.25rem 1.25rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+
+.detalle-datos {
+  display: flex;
+  flex-direction: column;
+}
+
+.detalle-fila {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.detalle-fila:last-child {
+  border-bottom: none;
+}
+
+.detalle-fila dt {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent);
+}
+
+.detalle-fila dd {
+  font-size: 1.05rem;
+  color: var(--color-text);
+}
+
+.detalle-fila--total dd {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.detalle-seccion-titulo {
+  margin: 2rem 0 1rem;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--color-primary);
+}
+
+.detalle-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+}
+
+.detalle-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.9rem 1.1rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+}
+
+.detalle-item-nombre {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.detalle-item-datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.5rem;
+  font-size: 0.9rem;
+  color: var(--color-accent);
+}
+
+.detalle-item-datos strong {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+/* ============================================
+   BREAKPOINT MD — Tablets (min-width: 768px)
+   ============================================ */
 @media (min-width: 768px) {
   .app-container {
     padding: 24px;
-  }
-
-  .app-logo {
-    height: 120px;
-    width: 120px;
-  }
-
-  .app-nav {
-    flex-direction: row;
-  }
-
-  .nav-link {
-    flex: 0 0 auto;
   }
 
   h2 {
@@ -328,35 +504,56 @@ h3 {
   }
 
   .crear-ingrediente-form {
-    padding: 20px;
+    padding: 28px 32px;
   }
 
   .form {
     display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 16px;
-    align-items: start;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 20px;
+    row-gap: 16px;
   }
 
   .form-actions {
     grid-column: 1 / -1;
+    justify-self: start;
   }
 
   .btn-submit {
     width: auto;
+    min-width: 220px;
+  }
+
+  .detalle-card {
+    padding: 0.5rem 2rem;
+  }
+
+  .detalle-fila {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    align-items: baseline;
+    gap: 1.25rem;
+  }
+
+  .detalle-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .detalle-item-datos {
+    flex-wrap: nowrap;
+    gap: 2rem;
   }
 }
 
-
+/* ============================================
+   BREAKPOINT LG — Escritorio (min-width: 1024px)
+   ============================================ */
 @media (min-width: 1024px) {
   .app-container {
     max-width: 900px;
     padding: 32px 24px;
-  }
-
-  .app-logo {
-    height: 140px;
-    width: 140px;
   }
 
   h2 {
@@ -364,6 +561,6 @@ h3 {
   }
 
   .crear-ingrediente-form {
-    padding: 24px;
+    padding: 32px 40px;
   }
 }

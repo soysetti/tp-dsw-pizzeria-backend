@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import { Cliente } from './cliente.entity.js';
 import { ClienteRepository } from './cliente.repository.js';
 import { HttpError } from '../shared/http-error.js';
@@ -39,12 +40,18 @@ export async function crearCliente(datos: any): Promise<Cliente> {
     throw new HttpError(400, 'El domicilio es requerido y debe ser texto');
   }
 
-  return repository.add(datos);
+  const contraseniaHasheada = await bcrypt.hash(contrasenia, 10);
+
+  return repository.add({ ...datos, contrasenia: contraseniaHasheada });
 }
 
 export async function actualizarCliente(id: number, datos: any): Promise<Cliente> {
   if (Object.keys(datos).length === 0) {
     throw new HttpError(400, 'Debe enviar al menos un campo para actualizar');
+  }
+
+  if (datos.contrasenia) {
+    datos.contrasenia = await bcrypt.hash(datos.contrasenia, 10);
   }
 
   const cliente = await repository.update(id, datos);

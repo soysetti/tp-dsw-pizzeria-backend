@@ -13,51 +13,34 @@ import './App.css';
 function App() {
   return (
     <BrowserRouter>
-      <main className="app-container">
-        <header className="app-header">
-          <img src={logo} alt="Pizzería Due Paffutelli" className="app-logo" />
-        </header>
-
-        <nav className="app-nav">
-          <NavLink
-            to="/ingredientes"
-            className={({ isActive }) => (isActive ? 'nav-link nav-link-active' : 'nav-link')}
-          >
+      <nav className="navbar">
+        <NavLink to="/" className="navbar-logo">
+          <img src={logo} alt="Pizzería Due Paffutelli" className="navbar-logo-img" />
+          Due Paffutelli
+        </NavLink>
+        <div className="navbar-links">
+          <NavLink to="/ingredientes" className={({ isActive }) => (isActive ? 'active' : '')}>
             Ingredientes
           </NavLink>
-          <NavLink
-            to="/repartidores"
-            className={({ isActive }) => (isActive ? 'nav-link nav-link-active' : 'nav-link')}
-          >
+          <NavLink to="/repartidores" className={({ isActive }) => (isActive ? 'active' : '')}>
             Repartidores
           </NavLink>
-          <NavLink
-            to="/pizzas"
-            className={({ isActive }) => (isActive ? 'nav-link nav-link-active' : 'nav-link')}
-          >
+          <NavLink to="/pizzas" className={({ isActive }) => (isActive ? 'active' : '')}>
             Pizzas
           </NavLink>
-          <NavLink
-            to="/clientes"
-            className={({ isActive }) => (isActive ? 'nav-link nav-link-active' : 'nav-link')}
-          >
+          <NavLink to="/clientes" className={({ isActive }) => (isActive ? 'active' : '')}>
             Clientes
           </NavLink>
-          <NavLink
-            to="/pedidos/nuevo"
-            className={({ isActive }) => (isActive ? 'nav-link nav-link-active' : 'nav-link')}
-          >
+          <NavLink to="/pedidos/nuevo" className={({ isActive }) => (isActive ? 'active' : '')}>
             Nuevo Pedido
           </NavLink>
-          <NavLink
-            to="/pedidos"
-            end
-            className={({ isActive }) => (isActive ? 'nav-link nav-link-active' : 'nav-link')}
-          >
+          <NavLink to="/pedidos" end className={({ isActive }) => (isActive ? 'active' : '')}>
             Pedidos
           </NavLink>
-        </nav>
+        </div>
+      </nav>
 
+      <main className="app-container">
         <section>
           <Routes>
             <Route path="/" element={<IngredientesList />} />
