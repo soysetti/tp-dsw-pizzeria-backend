@@ -1,63 +1,65 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { ClienteRepository } from '../cliente/cliente.repository.js';
+import bcrypt from 'bcryptjs';
+import { Cliente } from './cliente.entity.js';
+import { ClienteRepository } from './cliente.repository.js';
+import { HttpError } from '../shared/http-error.js';
 
-const clienteRepository = new ClienteRepository();
+const repository = new ClienteRepository();
 
-export interface UsuarioToken {
-  id: number;
-  email: string;
-  nivel_permisos: number;
+export async function listarClientes(): Promise<Cliente[]> {
+  return repository.findAll();
 }
 
-declare global {
-  namespace Express {
-    interface Request {
-      usuario?: UsuarioToken;
-    }
-  }
+export async function buscarCliente(id: number): Promise<Cliente> {
+  const cliente = await repository.findOne(id);
+  if (!cliente) throw new HttpError(404, 'Cliente no encontrado');
+  return cliente;
 }
 
-export async function verificarToken(req: Request, res: Response, next: NextFunction) {
-  const header = req.headers.authorization;
+export async function crearCliente(datos: any): Promise<Cliente> {
+  const { nombre, apellido, email, contrasenia, nivel_permisos, estado, domicilio } = datos;
 
-  if (!header || !header.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Token no provisto' });
+  if (!nombre || typeof nombre !== 'string') {
+    throw new HttpError(400, 'El nombre es requerido y debe ser texto');
+  }
+  if (!apellido || typeof apellido !== 'string') {
+    throw new HttpError(400, 'El apellido es requerido y debe ser texto');
+  }
+  if (!email || typeof email !== 'string') {
+    throw new HttpError(400, 'El email es requerido y debe ser texto');
+  }
+  if (!contrasenia || typeof contrasenia !== 'string') {
+    throw new HttpError(400, 'La contraseña es requerida y debe ser texto');
+  }
+  if (nivel_permisos === undefined || typeof nivel_permisos !== 'number') {
+    throw new HttpError(400, 'nivel_permisos es requerido y debe ser un número');
+  }
+  if (estado === undefined || typeof estado !== 'boolean') {
+    throw new HttpError(400, 'estado es requerido y debe ser booleano');
+  }
+  if (!domicilio || typeof domicilio !== 'string') {
+    throw new HttpError(400, 'El domicilio es requerido y debe ser texto');
   }
 
-  const token = header.split(' ')[1];
-  const secret = process.env.JWT_SECRET;
+  const contraseniaHasheada = await bcrypt.hash(contrasenia, 10);
 
-  if (!secret) {
-    return res.status(500).json({ message: 'JWT_SECRET no está configurado en el servidor' });
-  }
-
-  try {
-    const payload = jwt.verify(token, secret) as UsuarioToken;
-
-    const cliente = await clienteRepository.findOne(payload.id);
-    if (!cliente) {
-      return res.status(401).json({ message: 'Tu usuario ya no existe. Volvé a iniciar sesión.' });
-    }
-    if (!cliente.estado) {
-      return res.status(403).json({ message: 'Tu cuenta fue suspendida.' });
-    }
-
-    req.usuario = payload;
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: 'Token inválido o expirado' });
-  }
+  return repository.add({ ...datos, contrasenia: contraseniaHasheada });
 }
 
-export function requiereNivel(nivelMinimo: number) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.usuario) {
-      return res.status(401).json({ message: 'No autenticado' });
-    }
-    if (req.usuario.nivel_permisos < nivelMinimo) {
-      return res.status(403).json({ message: 'No tenés permisos suficientes para esta acción' });
-    }
-    next();
-  };
+export async function actualizarCliente(id: number, datos: any): Promise<Cliente> {
+  if (Object.keys(datos).length === 0) {
+    throw new HttpError(400, 'Debe enviar al menos un campo para actualizar');
+  }
+
+  if (datos.contrasenia) {
+    datos.contrasenia = await bcrypt.hash(datos.contrasenia, 10);
+  }
+
+  const cliente = await repository.update(id, datos);
+  if (!cliente) throw new HttpError(404, 'Cliente no encontrado');
+  return cliente;
+}
+
+export async function eliminarCliente(id: number): Promise<void> {
+  const eliminado = await repository.delete(id);
+  if (!eliminado) throw new HttpError(404, 'Cliente no encontrado');
 }
