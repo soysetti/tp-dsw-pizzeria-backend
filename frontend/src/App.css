@@ -201,6 +201,14 @@ h3 {
   line-height: 1.4;
 }
 
+/* La última columna (Acciones) ocupa solo lo que necesita,
+   así no queda un hueco vacío estirado a la derecha */
+.ingredientes-table th:last-child,
+.ingredientes-table td:last-child {
+  width: 1%;
+  white-space: nowrap;
+}
+
 .ingredientes-table tbody tr {
   border-bottom: 1px solid var(--color-border);
 }

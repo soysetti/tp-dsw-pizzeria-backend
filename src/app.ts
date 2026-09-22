@@ -11,6 +11,8 @@ import { detallePedidoRouter } from './detalle-pedido/detalle-pedido.routes.js';
 import { envioRouter } from './envio/envio.routes.js';
 import { ingredientePizzaRouter } from './ingrediente-pizza/ingrediente-pizza.routes.js';
 import { clienteRouter } from './cliente/cliente.routes.js';
+import { authRouter } from './auth/auth.routes.js';
+import { verificarToken, requiereNivel } from './auth/auth.middleware.js';
 
 
 const app = express();
@@ -25,27 +27,33 @@ app.use((req, res, next) => {
   RequestContext.create(orm.em, next);
 });
 
-// Registramos el router de ingredientes
-app.use('/api/ingredientes', ingredienteRouter);
+// Login (público, sin protección)
+app.use('/api/auth', authRouter);
 
-// Registramos el router de pizza
-app.use('/api/pizzas', pizzaRouter);
+// Registramos el router de ingredientes (solo Admin)
+app.use('/api/ingredientes', verificarToken, requiereNivel(1), ingredienteRouter);
 
-// Registramos el router de repartidores
-app.use('/api/repartidores', repartidorRouter);
+// Registramos el router de pizza (solo Admin)
+app.use('/api/pizzas', verificarToken, requiereNivel(1), pizzaRouter);
 
-// Registramos el router de pedidos
-app.use('/api/pedidos', pedidoRouter);
+// Registramos el router de repartidores (solo Admin)
+app.use('/api/repartidores', verificarToken, requiereNivel(1), repartidorRouter);
 
-// Registramos el router de detalle de pedidos
-app.use('/api/detalle-pedido', detallePedidoRouter);
+// Registramos el router de pedidos (cualquier usuario logueado; el detalle de qué
+// puede hacer cada nivel se controla dentro de pedido.routes.ts)
+app.use('/api/pedidos', verificarToken, pedidoRouter);
 
-app.use('/api/envios', envioRouter);
+// Registramos el router de detalle de pedidos (solo Admin)
+app.use('/api/detalle-pedido', verificarToken, requiereNivel(1), detallePedidoRouter);
 
-// Registramos el router de ingrediente-pizza
-app.use('/api/ingrediente-pizza', ingredientePizzaRouter);
+// Envíos (solo Admin)
+app.use('/api/envios', verificarToken, requiereNivel(1), envioRouter);
 
-app.use('/api/clientes', clienteRouter);
+// Registramos el router de ingrediente-pizza (solo Admin)
+app.use('/api/ingrediente-pizza', verificarToken, requiereNivel(1), ingredientePizzaRouter);
+
+// Clientes (solo Admin)
+app.use('/api/clientes', verificarToken, requiereNivel(1), clienteRouter);
 
 // Manejador global para endpoints inexistentes (404)
 app.use((_, res) => {

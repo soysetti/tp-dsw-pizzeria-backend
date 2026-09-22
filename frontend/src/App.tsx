@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
 import IngredientesList from './views/ingrediente/IngredientesList';
 import RepartidorList from './views/repartidor/repartidorList';
@@ -7,51 +8,186 @@ import CrearPedidoForm from './views/pedido/crearPedidoForm';
 import PedidoList from './views/pedido/pedidoList';
 import PedidoDetalle from './views/pedido/pedidoDetalle';
 import ClienteList from './views/cliente/clienteList';
+import LoginForm from './views/auth/LoginForm';
+import RutaProtegida from './components/RutaProtegida';
+import { useAuth } from './context/authContext';
 import logo from './assets/logo.png';
 import './App.css';
 
 function App() {
+  const { usuario, logout } = useAuth();
+
   return (
     <BrowserRouter>
       <nav className="navbar">
         <NavLink to="/" className="navbar-logo">
-          <img src={logo} alt="Pizzería Due Paffutelli" className="navbar-logo-img" />
+          <img
+            src={logo}
+            alt="Pizzería Due Paffutelli"
+            className="navbar-logo-img"
+          />
           Due Paffutelli
         </NavLink>
+
         <div className="navbar-links">
-          <NavLink to="/ingredientes" className={({ isActive }) => (isActive ? 'active' : '')}>
-            Ingredientes
-          </NavLink>
-          <NavLink to="/repartidores" className={({ isActive }) => (isActive ? 'active' : '')}>
-            Repartidores
-          </NavLink>
-          <NavLink to="/pizzas" className={({ isActive }) => (isActive ? 'active' : '')}>
-            Pizzas
-          </NavLink>
-          <NavLink to="/clientes" className={({ isActive }) => (isActive ? 'active' : '')}>
-            Clientes
-          </NavLink>
-          <NavLink to="/pedidos/nuevo" className={({ isActive }) => (isActive ? 'active' : '')}>
-            Nuevo Pedido
-          </NavLink>
-          <NavLink to="/pedidos" end className={({ isActive }) => (isActive ? 'active' : '')}>
-            Pedidos
-          </NavLink>
+          {usuario ? (
+            <>
+              {usuario.nivel_permisos >= 1 && (
+                <>
+                  <NavLink
+                    to="/ingredientes"
+                    className={({ isActive }) => (isActive ? 'active' : '')}
+                  >
+                    Ingredientes
+                  </NavLink>
+
+                  <NavLink
+                    to="/repartidores"
+                    className={({ isActive }) => (isActive ? 'active' : '')}
+                  >
+                    Repartidores
+                  </NavLink>
+
+                  <NavLink
+                    to="/pizzas"
+                    className={({ isActive }) => (isActive ? 'active' : '')}
+                  >
+                    Pizzas
+                  </NavLink>
+
+                  <NavLink
+                    to="/clientes"
+                    className={({ isActive }) => (isActive ? 'active' : '')}
+                  >
+                    Clientes
+                  </NavLink>
+
+                  <NavLink
+                    to="/pedidos"
+                    end
+                    className={({ isActive }) => (isActive ? 'active' : '')}
+                  >
+                    Pedidos
+                  </NavLink>
+                </>
+              )}
+
+              <NavLink
+                to="/pedidos/nuevo"
+                className={({ isActive }) => (isActive ? 'active' : '')}
+              >
+                Nuevo Pedido
+              </NavLink>
+
+              <button
+                onClick={logout}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
+              >
+                Salir ({usuario.nombre})
+              </button>
+            </>
+          ) : (
+            <NavLink
+              to="/login"
+              className={({ isActive }) => (isActive ? 'active' : '')}
+            >
+              Iniciar sesión
+            </NavLink>
+          )}
         </div>
       </nav>
 
       <main className="app-container">
         <section>
           <Routes>
-            <Route path="/" element={<IngredientesList />} />
-            <Route path="/ingredientes" element={<IngredientesList />} />
-            <Route path="/repartidores" element={<RepartidorList />} />
-            <Route path="/pizzas" element={<PizzaList />} />
-            <Route path="/pizzas/:id" element={<PizzaDetalle />} />
-            <Route path="/pedidos/nuevo" element={<CrearPedidoForm />} />
-            <Route path="/pedidos" element={<PedidoList />} />
-            <Route path="/pedidos/:id" element={<PedidoDetalle />} />
-            <Route path="/clientes" element={<ClienteList />} />
+            <Route path="/login" element={<LoginForm />} />
+
+            <Route
+              path="/"
+              element={
+                <RutaProtegida nivelRequerido={1}>
+                  <IngredientesList />
+                </RutaProtegida>
+              }
+            />
+
+            <Route
+              path="/ingredientes"
+              element={
+                <RutaProtegida nivelRequerido={1}>
+                  <IngredientesList />
+                </RutaProtegida>
+              }
+            />
+
+            <Route
+              path="/repartidores"
+              element={
+                <RutaProtegida nivelRequerido={1}>
+                  <RepartidorList />
+                </RutaProtegida>
+              }
+            />
+
+            <Route
+              path="/pizzas"
+              element={
+                <RutaProtegida nivelRequerido={1}>
+                  <PizzaList />
+                </RutaProtegida>
+              }
+            />
+
+            <Route
+              path="/pizzas/:id"
+              element={
+                <RutaProtegida nivelRequerido={1}>
+                  <PizzaDetalle />
+                </RutaProtegida>
+              }
+            />
+
+            <Route
+              path="/clientes"
+              element={
+                <RutaProtegida nivelRequerido={1}>
+                  <ClienteList />
+                </RutaProtegida>
+              }
+            />
+
+            <Route
+              path="/pedidos/nuevo"
+              element={
+                <RutaProtegida nivelRequerido={0}>
+                  <CrearPedidoForm />
+                </RutaProtegida>
+              }
+            />
+
+            <Route
+              path="/pedidos"
+              element={
+                <RutaProtegida nivelRequerido={1}>
+                  <PedidoList />
+                </RutaProtegida>
+              }
+            />
+
+            <Route
+              path="/pedidos/:id"
+              element={
+                <RutaProtegida nivelRequerido={1}>
+                  <PedidoDetalle />
+                </RutaProtegida>
+              }
+            />
           </Routes>
         </section>
       </main>

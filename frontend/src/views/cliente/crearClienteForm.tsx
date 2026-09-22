@@ -33,7 +33,7 @@ export default function CrearClienteForm({ onClienteCreado }: Props) {
         apellido: apellido.trim(),
         email: email.trim(),
         contrasenia: contrasenia.trim(),
-        nivel_permisos: 0,
+        nivel_permisos: 1,
         estado: true,
         domicilio: domicilio.trim(),
       };

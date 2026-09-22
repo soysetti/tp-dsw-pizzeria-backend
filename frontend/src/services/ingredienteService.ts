@@ -1,10 +1,9 @@
-// src/services/ingredienteService.ts
-
 import type {
   Ingrediente,
   NuevoIngrediente,
   ActualizarIngrediente,
 } from '../interfaces/ingrediente';
+import { getAuthHeaders } from './httpCliente.ts';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -14,7 +13,9 @@ interface ApiResponse<T> {
 }
 
 export async function getIngredientes(): Promise<Ingrediente[]> {
-  const response = await fetch(`${API_URL}/ingredientes`);
+  const response = await fetch(`${API_URL}/ingredientes`, {
+    headers: { ...getAuthHeaders() },
+  });
 
   if (!response.ok) {
     throw new Error(`Error al obtener ingredientes: ${response.status}`);
@@ -25,7 +26,9 @@ export async function getIngredientes(): Promise<Ingrediente[]> {
 }
 
 export async function getIngredienteById(id: number): Promise<Ingrediente> {
-  const response = await fetch(`${API_URL}/ingredientes/${id}`);
+  const response = await fetch(`${API_URL}/ingredientes/${id}`, {
+    headers: { ...getAuthHeaders() },
+  });
 
   if (!response.ok) {
     throw new Error(`Error al obtener el ingrediente ${id}: ${response.status}`);
@@ -40,7 +43,7 @@ export async function crearIngrediente(
 ): Promise<Ingrediente> {
   const response = await fetch(`${API_URL}/ingredientes`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify(nuevoIngrediente),
   });
 
@@ -57,8 +60,8 @@ export async function actualizarIngrediente(
   cambios: ActualizarIngrediente
 ): Promise<Ingrediente> {
   const response = await fetch(`${API_URL}/ingredientes/${id}`, {
-    method: 'PUT', // tu backend registra ingredienteRouter.put('/:id', ...)
-    headers: { 'Content-Type': 'application/json' },
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify(cambios),
   });
 
@@ -73,6 +76,7 @@ export async function actualizarIngrediente(
 export async function eliminarIngrediente(id: number): Promise<void> {
   const response = await fetch(`${API_URL}/ingredientes/${id}`, {
     method: 'DELETE',
+    headers: { ...getAuthHeaders() },
   });
 
   if (!response.ok) {
