@@ -52,9 +52,10 @@ export default function RepartidorList() {
       setRepartidores((prev) => prev.filter((item) => item.id !== id));
       setConfirmandoEliminarId(null);
     } catch (err) {
-      setError('Error al intentar eliminar el repartidor.');
+      setError(err instanceof Error ? err.message : 'Error al intentar eliminar el repartidor.');
+     setConfirmandoEliminarId(null);
       console.error(err);
-    }
+}
   };
 
   const handleIniciarEdicion = (rep: Repartidor) => {

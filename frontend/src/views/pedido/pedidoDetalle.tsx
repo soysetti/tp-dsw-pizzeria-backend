@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import type { Pedido } from '../../interfaces/pedido';
 import { ESTADOS_PEDIDO } from '../../interfaces/pedido';
 import type { Pizza } from '../../interfaces/pizza';
-import { getPedidoById, actualizarEstadoPedido, eliminarPedido } from '../../services/pedidoService';
+import type { Repartidor } from '../../interfaces/repartidor';
+import { getPedidoById, actualizarEstadoPedido, asignarEnvio } from '../../services/pedidoService';
 import { getPizzas } from '../../services/pizzaService';
+import { getRepartidores } from '../../services/repartidorService';
 import {
   agregarItemAPedido,
   actualizarCantidadItem,
@@ -14,10 +16,10 @@ import {
 export default function PedidoDetalle() {
   const { id } = useParams<{ id: string }>();
   const pedidoId = Number(id);
-  const navigate = useNavigate();
 
   const [pedido, setPedido] = useState<Pedido | null>(null);
   const [pizzasDisponibles, setPizzasDisponibles] = useState<Pizza[]>([]);
+  const [repartidores, setRepartidores] = useState<Repartidor[]>([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,6 +31,9 @@ export default function PedidoDetalle() {
 
   const [pizzaNueva, setPizzaNueva] = useState<number | ''>('');
   const [cantidadNueva, setCantidadNueva] = useState<number>(1);
+  const [repartidorSeleccionado, setRepartidorSeleccionado] = useState<number | ''>('');
+  const [costoEnvio, setCostoEnvio] = useState<number>(0);
+  const [asignandoEnvio, setAsignandoEnvio] = useState(false);
 
   useEffect(() => {
     cargarDatos();
@@ -37,10 +42,11 @@ export default function PedidoDetalle() {
   const cargarDatos = async () => {
     try {
       setCargando(true);
-      const [pedidoData, pizzasData] = await Promise.all([getPedidoById(pedidoId), getPizzas()]);
+      const [pedidoData, pizzasData, repartidoresData] = await Promise.all([getPedidoById(pedidoId), getPizzas(), getRepartidores()]);
       setPedido(pedidoData);
       setEstadoSeleccionado(pedidoData.estado);
       setPizzasDisponibles(pizzasData.filter((p) => p.disponible));
+      setRepartidores(repartidoresData.filter((r) => r.estado));
       setError(null);
     } catch (err) {
       setError('No se pudo cargar el pedido.');
@@ -55,7 +61,7 @@ export default function PedidoDetalle() {
 
     if (estadoSeleccionado === 'Cancelado') {
       const confirmar = window.confirm(
-        '¿Confirmás que querés CANCELAR este pedido? Una vez cancelado, ya no vas a poder modificar sus ítems, solo eliminarlo.'
+        '¿Confirmás que querés CANCELAR este pedido? Una vez cancelado, ya no vas a poder modificar sus ítems.'
       );
       if (!confirmar) {
         setEstadoSeleccionado(pedido.estado);
@@ -75,15 +81,26 @@ export default function PedidoDetalle() {
     }
   };
 
-  const handleEliminarPedido = async () => {
-    if (!pedido) return;
-    if (!window.confirm(`¿Eliminar el pedido #${pedido.id}? Esta acción no se puede deshacer.`)) return;
+  const handleAsignarEnvio = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pedido || repartidorSeleccionado === '') {
+      alert('Seleccioná un repartidor.');
+      return;
+    }
+    if (costoEnvio < 0) {
+      alert('El costo del envío no puede ser negativo.');
+      return;
+    }
     try {
-      await eliminarPedido(pedido.id);
-      navigate('/pedidos');
+      setAsignandoEnvio(true);
+      const actualizado = await asignarEnvio(pedido.id, Number(repartidorSeleccionado), costoEnvio);
+      setPedido(actualizado);
+      setEstadoSeleccionado(actualizado.estado);
     } catch (err) {
-      alert('No se pudo eliminar el pedido.');
+      alert(err instanceof Error ? err.message : 'No se pudo asignar el envío.');
       console.error(err);
+    } finally {
+      setAsignandoEnvio(false);
     }
   };
 
@@ -202,6 +219,57 @@ export default function PedidoDetalle() {
         </div>
       </div>
 
+      {!pedido.retiro && (
+        <div className="crear-ingrediente-form">
+          <h3>Envío</h3>
+          {pedido.envio && pedido.repartidor ? (
+            <>
+              <p><strong>Repartidor:</strong> {pedido.repartidor.nombre} {pedido.repartidor.apellido} — Matrícula: {pedido.repartidor.matricula}</p>
+              <p><strong>Costo del envío:</strong> ${pedido.envio.costo.toFixed(2)}</p>
+            </>
+          ) : pedidoCancelado ? (
+            <p>No se puede asignar un envío a un pedido cancelado.</p>
+          ) : (
+            <form onSubmit={handleAsignarEnvio} className="form">
+              <div className="form-group">
+                <label>Repartidor:</label>
+                <select
+                  value={repartidorSeleccionado}
+                  onChange={(e) => setRepartidorSeleccionado(e.target.value === '' ? '' : Number(e.target.value))}
+                  className="form-input"
+                  required
+                >
+                  <option value="">Seleccioná un repartidor</option>
+                  {repartidores.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.nombre} {r.apellido} — {r.matricula}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group-small">
+                <label>Costo del envío:</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={costoEnvio}
+                  onChange={(e) => setCostoEnvio(Number(e.target.value))}
+                  className="form-input"
+                  required
+                />
+              </div>
+              <div className="form-actions">
+                <button type="submit" className="btn-submit" disabled={asignandoEnvio || repartidores.length === 0}>
+                  {asignandoEnvio ? 'Asignando...' : 'Asignar envío'}
+                </button>
+              </div>
+              {repartidores.length === 0 && <p>No hay repartidores activos disponibles.</p>}
+            </form>
+          )}
+        </div>
+      )}
+
       <h3>Ítems del pedido</h3>
       <table className="ingredientes-table">
         <thead>
@@ -304,11 +372,8 @@ export default function PedidoDetalle() {
 
       {pedidoCancelado && (
         <div className="crear-ingrediente-form">
-          <h3>Zona de peligro</h3>
-          <p>Este pedido está cancelado. Podés eliminarlo definitivamente si ya no lo necesitás.</p>
-          <button onClick={handleEliminarPedido} className="btn-eliminar">
-            Eliminar este pedido
-          </button>
+          <h3>Pedido dado de baja</h3>
+          <p>El pedido se encuentra cancelado y se conserva en el sistema como registro histórico.</p>
         </div>
       )}
     </div>

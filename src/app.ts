@@ -31,10 +31,12 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRouter);
 
 // Registramos el router de ingredientes (solo Admin)
-app.use('/api/ingredientes', verificarToken, requiereNivel(1), ingredienteRouter);
+app.use('/api/ingredientes', verificarToken,requiereNivel(1), ingredienteRouter);
 
+app.use( '/api/repartidores', verificarToken, requiereNivel(1), repartidorRouter);
 
-// Registramos el router de repartidores (solo Admin)
+// Pizzas (cualquier usuario autenticado puede consultar;
+// las modificaciones se restringen en pizza.routes.ts)
 app.use('/api/pizzas', verificarToken, pizzaRouter);
 
 // Registramos el router de pedidos (cualquier usuario logueado; el detalle de qué

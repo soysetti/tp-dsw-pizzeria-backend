@@ -31,7 +31,7 @@ export default function CrearClienteForm({ onClienteCreado }: Props) {
       const nuevo: NuevoCliente = {
         nombre: nombre.trim(),
         apellido: apellido.trim(),
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         contrasenia: contrasenia.trim(),
         nivel_permisos: 0,
         estado: true,
@@ -44,11 +44,12 @@ export default function CrearClienteForm({ onClienteCreado }: Props) {
       setApellido('');
       setEmail('');
       setContrasenia('');
+      setMostrarContrasenia(false);
       setDomicilio('');
 
       onClienteCreado(clienteCreado);
     } catch (err) {
-      setError('No se pudo guardar el cliente. Intente nuevamente.');
+      setError(err instanceof Error ? err.message : 'No se pudo guardar el cliente. Intente nuevamente.');
       console.error(err);
     } finally {
       setSubmitting(false);
@@ -57,7 +58,7 @@ export default function CrearClienteForm({ onClienteCreado }: Props) {
 
   return (
     <div className="crear-ingrediente-form">
-      <h3> Agregar Nuevo Cliente</h3>
+      <h3>Agregar Nuevo Cliente</h3>
 
       {error && <p className="form-error">⚠️ {error}</p>}
 
@@ -70,6 +71,7 @@ export default function CrearClienteForm({ onClienteCreado }: Props) {
             onChange={(e) => setNombre(e.target.value)}
             disabled={submitting}
             className="form-input"
+            required
           />
         </div>
 
@@ -81,6 +83,7 @@ export default function CrearClienteForm({ onClienteCreado }: Props) {
             onChange={(e) => setApellido(e.target.value)}
             disabled={submitting}
             className="form-input"
+            required
           />
         </div>
 
@@ -92,11 +95,14 @@ export default function CrearClienteForm({ onClienteCreado }: Props) {
             onChange={(e) => setEmail(e.target.value)}
             disabled={submitting}
             className="form-input"
+            autoComplete="email"
+            required
           />
         </div>
 
         <div className="form-group">
           <label>Contraseña:</label>
+
           <div className="password-wrapper">
             <input
               type={mostrarContrasenia ? 'text' : 'password'}
@@ -104,7 +110,10 @@ export default function CrearClienteForm({ onClienteCreado }: Props) {
               onChange={(e) => setContrasenia(e.target.value)}
               disabled={submitting}
               className="form-input"
+              autoComplete="new-password"
+              required
             />
+
             <button
               type="button"
               onClick={() => setMostrarContrasenia((prev) => !prev)}
@@ -125,6 +134,7 @@ export default function CrearClienteForm({ onClienteCreado }: Props) {
             placeholder="Ej. San Martín 1234"
             disabled={submitting}
             className="form-input"
+            required
           />
         </div>
 

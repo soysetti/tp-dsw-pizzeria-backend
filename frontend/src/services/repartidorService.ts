@@ -16,7 +16,10 @@ export async function getRepartidores(): Promise<Repartidor[]> {
   const response = await fetch(`${API_URL}/repartidores`, {
     headers: { ...getAuthHeaders() },
   });
-  if (!response.ok) throw new Error(`Error al obtener repartidores: ${response.status}`);
+  if (!response.ok) {
+  const body = await response.json().catch(() => null);
+  throw new Error(body?.message || `Error al crear repartidor: ${response.status}`);
+ }
   const body: ApiResponse<Repartidor[]> = await response.json();
   return body.data;
 }
@@ -41,7 +44,10 @@ export async function actualizarRepartidor(
     headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify(cambios),
   });
-  if (!response.ok) throw new Error(`Error al actualizar repartidor ${id}: ${response.status}`);
+  if (!response.ok) {
+  const body = await response.json().catch(() => null);
+  throw new Error(body?.message || `Error al actualizar repartidor ${id}: ${response.status}`);
+ }
   const body: ApiResponse<Repartidor> = await response.json();
   return body.data;
 }
@@ -51,5 +57,9 @@ export async function eliminarRepartidor(id: number): Promise<void> {
     method: 'DELETE',
     headers: { ...getAuthHeaders() },
   });
-  if (!response.ok) throw new Error(`Error al eliminar repartidor ${id}: ${response.status}`);
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.message || `Error al eliminar repartidor ${id}: ${response.status}`);
+  }
 }

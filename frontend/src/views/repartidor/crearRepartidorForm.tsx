@@ -30,7 +30,7 @@ export default function CrearRepartidorForm({ onRepartidorCreado }: Props) {
       const nuevo: NuevoRepartidor = {
         nombre: nombre.trim(),
         apellido: apellido.trim(),
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         contrasenia: contrasenia.trim(),
         nivel_permisos: 1,
         estado: true,
@@ -48,7 +48,7 @@ export default function CrearRepartidorForm({ onRepartidorCreado }: Props) {
 
       onRepartidorCreado(repartidorCreado);
     } catch (err) {
-      setError('No se pudo guardar el repartidor. Intente nuevamente.');
+      setError(err instanceof Error ? err.message : 'No se pudo guardar el repartidor. Intente nuevamente.');
       console.error(err);
     } finally {
       setSubmitting(false);

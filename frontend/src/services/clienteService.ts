@@ -8,11 +8,25 @@ interface ApiResponse<T> {
   data: T;
 }
 
+interface ApiError {
+  message?: string;
+}
+
+async function obtenerMensajeError(response: Response, mensajePredeterminado: string): Promise<string> {
+  const body: ApiError | null = await response.json().catch(() => null);
+  return body?.message || mensajePredeterminado;
+}
+
 export async function getClientes(): Promise<Cliente[]> {
   const response = await fetch(`${API_URL}/clientes`, {
     headers: { ...getAuthHeaders() },
   });
-  if (!response.ok) throw new Error(`Error al obtener clientes: ${response.status}`);
+
+  if (!response.ok) {
+    const mensaje = await obtenerMensajeError(response, `Error al obtener clientes: ${response.status}`);
+    throw new Error(mensaje);
+  }
+
   const body: ApiResponse<Cliente[]> = await response.json();
   return body.data;
 }
@@ -23,7 +37,12 @@ export async function crearCliente(nuevo: NuevoCliente): Promise<Cliente> {
     headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify(nuevo),
   });
-  if (!response.ok) throw new Error(`Error al crear cliente: ${response.status}`);
+
+  if (!response.ok) {
+    const mensaje = await obtenerMensajeError(response, `Error al crear cliente: ${response.status}`);
+    throw new Error(mensaje);
+  }
+
   const body: ApiResponse<Cliente> = await response.json();
   return body.data;
 }
@@ -34,7 +53,12 @@ export async function actualizarCliente(id: number, cambios: ActualizarCliente):
     headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify(cambios),
   });
-  if (!response.ok) throw new Error(`Error al actualizar cliente ${id}: ${response.status}`);
+
+  if (!response.ok) {
+    const mensaje = await obtenerMensajeError(response, `Error al actualizar cliente ${id}: ${response.status}`);
+    throw new Error(mensaje);
+  }
+
   const body: ApiResponse<Cliente> = await response.json();
   return body.data;
 }
@@ -44,5 +68,9 @@ export async function eliminarCliente(id: number): Promise<void> {
     method: 'DELETE',
     headers: { ...getAuthHeaders() },
   });
-  if (!response.ok) throw new Error(`Error al eliminar cliente ${id}: ${response.status}`);
+
+  if (!response.ok) {
+    const mensaje = await obtenerMensajeError(response, `Error al eliminar cliente ${id}: ${response.status}`);
+    throw new Error(mensaje);
+  }
 }

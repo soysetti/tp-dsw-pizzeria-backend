@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
 import IngredientesList from './views/ingrediente/IngredientesList';
 import RepartidorList from './views/repartidor/repartidorList';
@@ -7,6 +6,8 @@ import PizzaDetalle from './views/pizza/pizzaDetalle';
 import CrearPedidoForm from './views/pedido/crearPedidoForm';
 import PedidoList from './views/pedido/pedidoList';
 import PedidoDetalle from './views/pedido/pedidoDetalle';
+import MisPedidos from './views/pedido/misPedidos';
+import MiPedidoDetalle from './views/pedido/miPedidoDetalle';
 import ClienteList from './views/cliente/clienteList';
 import LoginForm from './views/auth/LoginForm';
 import RutaProtegida from './components/RutaProtegida';
@@ -79,6 +80,15 @@ function App() {
                 Nuevo Pedido
               </NavLink>
 
+              {usuario.nivel_permisos === 0 && (
+                <NavLink
+                  to="/mis-pedidos"
+                  className={({ isActive }) => (isActive ? 'active' : '')}
+                >
+                  Mis Pedidos
+                </NavLink>
+              )}
+
               <button
                 onClick={logout}
                 style={{
@@ -111,8 +121,8 @@ function App() {
             <Route
               path="/"
               element={
-                <RutaProtegida nivelRequerido={1}>
-                  <IngredientesList />
+                <RutaProtegida nivelRequerido={0}>
+                  {(usuario?.nivel_permisos ?? 0) >= 1 ? <IngredientesList /> : <MisPedidos />}
                 </RutaProtegida>
               }
             />
@@ -167,6 +177,24 @@ function App() {
               element={
                 <RutaProtegida nivelRequerido={0}>
                   <CrearPedidoForm />
+                </RutaProtegida>
+              }
+            />
+
+            <Route
+              path="/mis-pedidos"
+              element={
+                <RutaProtegida nivelRequerido={0}>
+                  <MisPedidos />
+                </RutaProtegida>
+              }
+            />
+
+            <Route
+              path="/mis-pedidos/:id"
+              element={
+                <RutaProtegida nivelRequerido={0}>
+                  <MiPedidoDetalle />
                 </RutaProtegida>
               }
             />

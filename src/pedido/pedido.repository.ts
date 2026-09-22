@@ -12,14 +12,16 @@ export interface ItemPedidoInput {
 }
 
 export class PedidoRepository implements Repository<Pedido> {
-  async findAll(estado?: string): Promise<Pedido[]> {
-    const filtro = estado ? { estado } : {};
-    return orm.em.find(Pedido, filtro, { populate: ['detalles', 'detalles.pizza'] });
+async findAll(estado?: string, clienteId?: number): Promise<Pedido[]> {
+    const filtro: any = {};
+     if (estado) filtro.estado = estado;
+     if (clienteId !== undefined) filtro.cliente = clienteId;
+     return orm.em.find(Pedido, filtro, { populate: ['detalles', 'detalles.pizza', 'cliente', 'repartidor', 'envio'], orderBy: { dia: 'DESC' } });
   }
 
   async findOne(id: number): Promise<Pedido | null> {
-    return orm.em.findOne(Pedido, { id }, { populate: ['detalles', 'detalles.pizza', 'cliente', 'repartidor'] });
-  }
+  return orm.em.findOne(Pedido,{ id }, {populate: ['detalles', 'detalles.pizza', 'cliente', 'repartidor', 'envio'],});
+ }
 
   async add(item: Pedido): Promise<Pedido> {
     const pedido = orm.em.create(Pedido, item);
@@ -68,7 +70,10 @@ export class PedidoRepository implements Repository<Pedido> {
   }
 
   async update(id: number, item: EntityData<Pedido>): Promise<Pedido | null> {
-    const pedido = await orm.em.findOne(Pedido, { id }, { populate: ['detalles', 'detalles.pizza', 'cliente', 'repartidor'] });
+    const pedido = await orm.em.findOne(
+  Pedido,
+  { id },
+  {populate: ['detalles','detalles.pizza','cliente','repartidor','envio',],});
     if (!pedido) return null;
     orm.em.assign(pedido, item);
     await orm.em.flush();

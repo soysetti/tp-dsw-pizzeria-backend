@@ -49,21 +49,16 @@ export async function actualizarEstadoPedido(id: number, estado: string): Promis
   return body.data;
 }
 
-export async function asignarRepartidor(id: number, repartidorId: number, estado: string): Promise<Pedido> {
-  const response = await fetch(`${API_URL}/pedidos/${id}`, {
-    method: 'PUT',
+export async function asignarEnvio(id: number, repartidorId: number, costo: number): Promise<Pedido> {
+  const response = await fetch(`${API_URL}/pedidos/${id}/asignar-envio`, {
+    method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-    body: JSON.stringify({ repartidorId, estado }),
+    body: JSON.stringify({ repartidorId, costo }),
   });
-  if (!response.ok) throw new Error(`Error al asignar repartidor al pedido ${id}: ${response.status}`);
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.message || `Error al asignar el envío al pedido ${id}`);
+  }
   const body: ApiResponse<Pedido> = await response.json();
   return body.data;
-}
-
-export async function eliminarPedido(id: number): Promise<void> {
-  const response = await fetch(`${API_URL}/pedidos/${id}`, {
-    method: 'DELETE',
-    headers: { ...getAuthHeaders() },
-  });
-  if (!response.ok) throw new Error(`Error al eliminar el pedido ${id}: ${response.status}`);
 }
