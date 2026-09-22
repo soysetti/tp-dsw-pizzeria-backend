@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { ClienteRepository } from '../cliente/cliente.repository.js';
+
+const clienteRepository = new ClienteRepository();
 
 export interface UsuarioToken {
   id: number;
@@ -15,7 +18,7 @@ declare global {
   }
 }
 
-export function verificarToken(req: Request, res: Response, next: NextFunction) {
+export async function verificarToken(req: Request, res: Response, next: NextFunction) {
   const header = req.headers.authorization;
 
   if (!header || !header.startsWith('Bearer ')) {
@@ -31,6 +34,15 @@ export function verificarToken(req: Request, res: Response, next: NextFunction) 
 
   try {
     const payload = jwt.verify(token, secret) as UsuarioToken;
+
+    const cliente = await clienteRepository.findOne(payload.id);
+    if (!cliente) {
+      return res.status(401).json({ message: 'Tu usuario ya no existe. Volvé a iniciar sesión.' });
+    }
+    if (!cliente.estado) {
+      return res.status(403).json({ message: 'Tu cuenta fue suspendida.' });
+    }
+
     req.usuario = payload;
     next();
   } catch (error) {

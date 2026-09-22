@@ -22,8 +22,8 @@ export default function LoginForm() {
 
     try {
       setSubmitting(true);
-      await login(email.trim(), contrasenia);
-      navigate('/');
+      const usuario = await login(email.trim(), contrasenia);
+      navigate(usuario.nivel_permisos >= 1 ? '/' : '/pedidos/nuevo');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo iniciar sesión.');
     } finally {

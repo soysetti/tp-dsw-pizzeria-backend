@@ -33,11 +33,9 @@ app.use('/api/auth', authRouter);
 // Registramos el router de ingredientes (solo Admin)
 app.use('/api/ingredientes', verificarToken, requiereNivel(1), ingredienteRouter);
 
-// Registramos el router de pizza (solo Admin)
-app.use('/api/pizzas', verificarToken, requiereNivel(1), pizzaRouter);
 
 // Registramos el router de repartidores (solo Admin)
-app.use('/api/repartidores', verificarToken, requiereNivel(1), repartidorRouter);
+app.use('/api/pizzas', verificarToken, pizzaRouter);
 
 // Registramos el router de pedidos (cualquier usuario logueado; el detalle de qué
 // puede hacer cada nivel se controla dentro de pedido.routes.ts)

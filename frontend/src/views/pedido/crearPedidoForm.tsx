@@ -5,6 +5,7 @@ import type { ItemPedido, Pedido } from '../../interfaces/pedido';
 import { getClientes } from '../../services/clienteService';
 import { getPizzas } from '../../services/pizzaService';
 import { crearPedido } from '../../services/pedidoService';
+import { useAuth } from '../../context/authContext';
 
 interface ItemCarrito extends ItemPedido {
   nombrePizza: string;
@@ -12,6 +13,9 @@ interface ItemCarrito extends ItemPedido {
 }
 
 export default function CrearPedidoForm() {
+  const { usuario } = useAuth();
+  const esAdmin = usuario ? usuario.nivel_permisos >= 1 : false;
+
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [pizzas, setPizzas] = useState<Pizza[]>([]);
   const [cargando, setCargando] = useState(true);
@@ -35,12 +39,19 @@ export default function CrearPedidoForm() {
   const cargarDatos = async () => {
     try {
       setCargando(true);
-      const [clientesData, pizzasData] = await Promise.all([getClientes(), getPizzas()]);
-      setClientes(clientesData);
-      setPizzas(pizzasData.filter((p) => p.disponible));
+
+      if (esAdmin) {
+        const [clientesData, pizzasData] = await Promise.all([getClientes(), getPizzas()]);
+        setClientes(clientesData);
+        setPizzas(pizzasData.filter((p) => p.disponible));
+      } else {
+        const pizzasData = await getPizzas();
+        setPizzas(pizzasData.filter((p) => p.disponible));
+      }
+
       setError(null);
     } catch (err) {
-      setError('No se pudieron cargar los clientes o las pizzas.');
+      setError('No se pudieron cargar los datos necesarios para el pedido.');
       console.error(err);
     } finally {
       setCargando(false);
@@ -88,7 +99,7 @@ export default function CrearPedidoForm() {
   );
 
   const handleConfirmarPedido = async () => {
-    if (clienteId === '') {
+    if (esAdmin && clienteId === '') {
       alert('Elegí un cliente.');
       return;
     }
@@ -99,11 +110,13 @@ export default function CrearPedidoForm() {
 
     try {
       setEnviando(true);
+
       const nuevo = await crearPedido({
         retiro,
-        clienteId: Number(clienteId),
+        clienteId: esAdmin ? Number(clienteId) : (usuario?.id ?? 0),
         items: carrito.map(({ pizzaId, cantidad }) => ({ pizzaId, cantidad })),
       });
+
       setPedidoConfirmado(nuevo);
       setCarrito([]);
       setClienteId('');
@@ -120,13 +133,13 @@ export default function CrearPedidoForm() {
 
   return (
     <div className="ingredientes-container">
-      <h2>Registrar Nuevo Pedido</h2>
+      <h2>🧾 Registrar Nuevo Pedido</h2>
 
       {error && <div className="error-message">⚠️ {error}</div>}
 
       {pedidoConfirmado && (
         <div className="crear-ingrediente-form">
-          <h3>Pedido #{pedidoConfirmado.id} registrado</h3>
+          <h3>✅ Pedido #{pedidoConfirmado.id} registrado</h3>
           <p>
             Total: <strong>${pedidoConfirmado.total}</strong> — Estado: {pedidoConfirmado.estado}
           </p>
@@ -137,21 +150,30 @@ export default function CrearPedidoForm() {
         <h3>Datos del pedido</h3>
 
         <div className="form">
-          <div className="form-group">
-            <label>Cliente:</label>
-            <select
-              value={clienteId}
-              onChange={(e) => setClienteId(e.target.value === '' ? '' : Number(e.target.value))}
-              className="form-input"
-            >
-              <option value="">Seleccioná un cliente</option>
-              {clientes.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nombre} {c.apellido}
-                </option>
-              ))}
-            </select>
-          </div>
+          {esAdmin ? (
+            <div className="form-group">
+              <label>Cliente:</label>
+              <select
+                value={clienteId}
+                onChange={(e) => setClienteId(e.target.value === '' ? '' : Number(e.target.value))}
+                className="form-input"
+              >
+                <option value="">Seleccioná un cliente</option>
+                {clientes.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nombre} {c.apellido}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <div className="form-group">
+              <label>Cliente:</label>
+              <p style={{ margin: 0, fontWeight: 600 }}>
+                {usuario?.nombre} {usuario?.apellido}
+              </p>
+            </div>
+          )}
 
           <div className="form-group-small">
             <label>

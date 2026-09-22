@@ -7,7 +7,7 @@ interface AuthContextType {
   usuario: UsuarioLogueado | null;
   token: string | null;
   cargandoSesion: boolean;
-  login: (email: string, contrasenia: string) => Promise<void>;
+  login: (email: string, contrasenia: string) => Promise<UsuarioLogueado>;
   logout: () => void;
 }
 
@@ -35,12 +35,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCargandoSesion(false);
   }, []);
 
-  const login = async (email: string, contrasenia: string) => {
+    const login = async (email: string, contrasenia: string) => {
     const resultado = await loginService(email, contrasenia);
     setToken(resultado.token);
     setUsuario(resultado.usuario);
     localStorage.setItem('token', resultado.token);
     localStorage.setItem('usuario', JSON.stringify(resultado.usuario));
+    return resultado.usuario;
   };
 
   const logout = () => {

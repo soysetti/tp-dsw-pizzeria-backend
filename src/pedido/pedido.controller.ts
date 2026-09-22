@@ -49,7 +49,13 @@ export async function findOne(req: Request, res: Response) {
 
 export async function add(req: Request, res: Response) {
   try {
-    const { retiro, clienteId, items } = req.body.pedidoInput;
+    const { retiro, items } = req.body.pedidoInput;
+
+    const clienteId =
+      req.usuario && req.usuario.nivel_permisos === 0
+        ? req.usuario.id
+        : req.body.pedidoInput.clienteId;
+
     const nuevoPedido = await service.crearPedido(retiro, clienteId, items);
     return res.status(201).json({ message: 'Pedido creado con éxito', data: nuevoPedido });
   } catch (error) {
@@ -64,7 +70,6 @@ export async function update(req: Request, res: Response) {
       return res.status(400).json({ message: 'El ID provisto debe ser un número entero válido' });
     }
 
-    // "items" y "clienteId" solo tienen sentido en la creación (add).
     delete req.body.pedidoInput.items;
     delete req.body.pedidoInput.clienteId;
 
@@ -74,6 +79,7 @@ export async function update(req: Request, res: Response) {
     return handleError(res, error);
   }
 }
+
 export async function remove(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
